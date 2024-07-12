@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\bg_city.png" />
+    <None Remove="Resources\cloud.png" />
+    <None Remove="Resources\dir.png" />
+    <None Remove="Resources\dislike.png" />
+    <None Remove="Resources\exit_icon_64x64.png" />
+    <None Remove="Resources\explore.png" />
+    <None Remove="Resources\happy.png" />
+    <None Remove="Resources\icon_app.png" />
+    <None Remove="Resources\like.png" />
+    <None Remove="Resources\rain.png" />
+    <None Remove="Resources\rain_cloud.png" />
+    <None Remove="Resources\snow.png" />
+    <None Remove="Resources\storm.png" />
+    <None Remove="Resources\sun.png" />
+    <None Remove="Resources\sunrise.png" />
+    <None Remove="Resources\sunset.png" />
+    <None Remove="Resources\sun_cloud.png" />
+    <None Remove="Resources\water.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WeatherWPF.ViewModel\WeatherWPF.ViewModel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\bg_city.png" />
+    <Resource Include="Resources\cloud.png" />
+    <Resource Include="Resources\dir.png" />
+    <Resource Include="Resources\dislike.png" />
+    <Resource Include="Resources\exit_icon_64x64.png" />
+    <Resource Include="Resources\explore.png" />
+    <Resource Include="Resources\happy.png" />
+    <Resource Include="Resources\icon_app.png" />
+    <Resource Include="Resources\like.png" />
+    <Resource Include="Resources\rain.png" />
+    <Resource Include="Resources\rain_cloud.png" />
+    <Resource Include="Resources\snow.png" />
+    <Resource Include="Resources\storm.png" />
+    <Resource Include="Resources\sun.png" />
+    <Resource Include="Resources\sunrise.png" />
+    <Resource Include="Resources\sunset.png" />
+    <Resource Include="Resources\sun_cloud.png" />
+    <Resource Include="Resources\water.png" />
+  </ItemGroup>
+
+</Project>
