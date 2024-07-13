@@ -4,15 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WeatherWPF.View"
-        xmlns:vm="clr-namespace:WeatherWPF.ViewModel"
+        xmlns:vm="clr-namespace:WeatherWPF.ViewModel;assembly=WeatherWPF.ViewModel"
         mc:Ignorable="d"
         Title="Weather forecast" Height="685" Width="995" Icon="Resources/icon_app.png"
         Background="Transparent" WindowStyle="None" AllowsTransparency="True"
         WindowStartupLocation="CenterScreen" FontFamily="Cambria" 
         MinWidth="995" MinHeight="685" ResizeMode="CanResizeWithGrip" MouseDown="Window_MouseDown">
-    <!--<Window.DataContext>
+    <Window.DataContext>
         <vm:MainVM/>
-    </Window.DataContext>-->
+    </Window.DataContext>
 
     <Grid>
         <!-- Left side -->
@@ -32,20 +32,21 @@
                         </Grid.ColumnDefinitions>
 
                         <Image Source="Resources/explore.png" Height="18" Margin="5 0 0 0"/>
-                        <TextBlock x:Name="SearchTextBlock" Text="Search ..." Style="{StaticResource HintText}"/>
-                        <TextBox x:Name="SearchTextBox" Style="{StaticResource TextBox}"/>
+                        <!--<TextBlock x:Name="SearchTextBlock" Text="Search ..." Style="{StaticResource HintText}"/>-->
+                        <TextBox x:Name="SearchTextBox" Style="{StaticResource TextBox}" Text="{Binding CityName}"/>
+                        <Button Content="find" Style="{StaticResource Button}" Command="{Binding GetWeatherCommand}"/>
                     </Grid>
                 </Border>
 
                 <!-- Weather info shortly -->
                 <StackPanel Margin="50 60 0 0">
-                    <Image Source="Resources/sun_cloud.png" Width="140" HorizontalAlignment="Left" />
-                    <TextBlock Text="12°c" FontSize="46" Margin="0 20 0 0"/>
+                    <Image Source="{Binding ConditionIcon}" Width="110" HorizontalAlignment="Left" />
+                    <TextBlock Text="{Binding TempC}" FontSize="46" Margin="0 20 0 0"/>
                     <TextBlock Text="{Binding DateTimeNow}" FontSize="18" FontWeight="SemiBold" Margin="0 15 0 0"/>
                     <Separator Background="#dadada" Margin="3 30 40 30" Height="0.8"/>
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="Resources/cloud.png" Width="20" Height="20"/>
-                        <TextBlock Text="Mostly Cloudy" FontSize="14" FontWeight="SemiBold" Margin="10 0 0 0" VerticalAlignment="Center"/>
+                        <Image Source="{Binding ConditionIcon}" Width="20" Height="20"/>
+                        <TextBlock Text="{Binding ConditionText}" FontSize="14" FontWeight="SemiBold" Margin="10 0 0 0" VerticalAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0 15 0 77">
                         <Image Source="Resources/water.png" Width="20" Height="20"/>
@@ -78,7 +79,7 @@
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Content="°C" Style="{StaticResource Button}" Background="#1A1A1A" Foreground="#FFFFFF"/>
-                        <Button Content="°F" Style="{StaticResource Button}" Margin="10 0 0 0"/>
+                        <Button Content="°F" Style="{StaticResource Button}" Margin="10 0 0 0" Command="{Binding ConvertToFahrenheit}"/>
                         <Button Content="✖" Style="{StaticResource Button}" Margin="10 0 0 0" Command="{Binding QuitCommand}"/>
                     </StackPanel>
                 </Grid>
@@ -180,7 +181,7 @@
                                 <Image Source="Resources/like.png" Width="18" Height="18" Margin="10 0 0 0"/>
                             </StackPanel>
 
-                            <Slider Style="{DynamicResource SliderStyle1}" Value="5.5" Maximum="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90"/>
+                            <Slider Style="{DynamicResource SliderStyle1}" Value="{Binding HumiditySlider}" Maximum="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90"/>
                         </Grid>
                     </Border>
 

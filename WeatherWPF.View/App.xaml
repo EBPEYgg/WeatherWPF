@@ -16,7 +16,7 @@
         
         <Style x:Key="TextBox" TargetType="TextBox">
             <Setter Property="Background" Value= "Transparent" />
-            <Setter Property="Foreground" Value="#878787" />
+            <Setter Property="Foreground" Value="#515151" />
             <Setter Property="FontSize" Value="14" />
             <Setter Property="Margin" Value="10 0 0 0" />
             <Setter Property="Grid.Column" Value="1" />
