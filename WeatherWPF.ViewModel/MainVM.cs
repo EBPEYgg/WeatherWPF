@@ -1,7 +1,11 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
+using System;
+using System.Globalization;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using WeatherWPF.Model;
 
 namespace WeatherWPF.ViewModel
@@ -17,6 +21,12 @@ namespace WeatherWPF.ViewModel
         private const string _apiKeyWeather = "9fbca1cd22b74a98808145032241207";
 
         /// <summary>
+        /// API ключ сервиса, предоставляющий информацию 
+        /// о времени и дате для различных часовых поясов.
+        /// </summary>
+        private const string _apiKeyTimeZoneDB = "CUHLWKFUKN7W";
+
+        /// <summary>
         /// Текущее время.
         /// </summary>
         [ObservableProperty]
@@ -27,6 +37,16 @@ namespace WeatherWPF.ViewModel
         /// </summary>
         [ObservableProperty]
         private string _cityName;
+
+        /// <summary>
+        /// Западная долгота города.
+        /// </summary>
+        private string longitude;
+
+        /// <summary>
+        /// Северная широта города.
+        /// </summary>
+        private string latitude;
 
         /// <summary>
         /// Скорость ветра.
@@ -47,7 +67,7 @@ namespace WeatherWPF.ViewModel
         private double _humiditySlider;
 
         /// <summary>
-        /// Количество градусов по Цельсию.
+        /// Количество градусов.
         /// </summary>
         [ObservableProperty]
         private string _tempC;
@@ -71,7 +91,7 @@ namespace WeatherWPF.ViewModel
 
         public RelayCommand GetWeatherCommand { get; set; }
 
-        public RelayCommand ConvertToFahrenheit { get; set; }
+        public RelayCommand ConvertToFahrenheitCommand { get; set; }
 
         /// <summary>
         /// Конструктор класса <see cref="MainVM"/>.
@@ -80,7 +100,6 @@ namespace WeatherWPF.ViewModel
         {
             QuitCommand = new RelayCommand(Quit);
             GetWeatherCommand = new RelayCommand(GetWeather);
-            DateTimeNow = DateTime.Now;
             CityName = "London";
             GetWeatherCommand.Execute(this);
         }
@@ -99,8 +118,7 @@ namespace WeatherWPF.ViewModel
         {
             if (string.IsNullOrEmpty(CityName))
             {
-
-                return;
+                Console.WriteLine($"{CityName} was not found.");
             }
 
             string apiUrl = $"http://api.weatherapi.com/v1/current.json?key={_apiKeyWeather}&q={CityName}";
@@ -119,16 +137,21 @@ namespace WeatherWPF.ViewModel
                             string jsonResponse = reader.ReadToEnd();
                             WeatherData weatherData = JsonConvert.DeserializeObject<WeatherData>(jsonResponse);
                             DisplayWeatherData(weatherData);
+                            //GetTimeFromCoordinatesCommand.Execute(this);
                         }
                     }
                 }
             }
             catch (WebException ex)
             {
-                return;
+                Console.WriteLine($"Error: {ex.Message}");
             }
         }
 
+        /// <summary>
+        /// Метод, который отображает полученные данные о погоде на View.
+        /// </summary>
+        /// <param name="weatherData">Данные о погоде.</param>
         private void DisplayWeatherData(WeatherData weatherData)
         {
             TempC = Convert.ToInt32(weatherData.CurrentWeather.TempC) + "°c";
@@ -137,6 +160,55 @@ namespace WeatherWPF.ViewModel
             HumiditySlider = Humidity / 10;
             ConditionText = weatherData.CurrentWeather.Condition.Text;
             ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
+
+            longitude = weatherData.Location.Lon.ToString("0.00", CultureInfo.InvariantCulture);
+            latitude = weatherData.Location.Lat.ToString("0.00", CultureInfo.InvariantCulture);
+            GetTimeFromCoordinates(longitude, latitude);
+        }
+
+        /// <summary>
+        /// Метод, который получает JSON файл с временем и датой 
+        /// для указанного города при помощи запроса на сервер.
+        /// </summary>
+        private async void GetTimeFromCoordinates(string longitude, string latitude)
+        {
+            if (string.IsNullOrEmpty(CityName))
+            {
+                Console.WriteLine($"{CityName} was not found.");
+            }
+
+            string apiUrl = $"http://api.timezonedb.com/v2.1/get-time-zone?key={_apiKeyTimeZoneDB}&format=json&by=position&lat={latitude}&lng={longitude}";
+
+            try
+            {
+                HttpWebRequest request = WebRequest.CreateHttp(apiUrl);
+                request.Method = "GET";
+
+                using (WebResponse response = await request.GetResponseAsync())
+                {
+                    using (Stream stream = response.GetResponseStream())
+                    {
+                        using (StreamReader reader = new StreamReader(stream))
+                        {
+                            string jsonResponse = await reader.ReadToEndAsync();
+                            Model.TimeZoneInfo timeZoneInfo = JsonConvert.DeserializeObject<Model.TimeZoneInfo>(jsonResponse);
+                            UpdateTimeZoneInfo(timeZoneInfo);
+                        }
+                    }
+                }
+            }
+            catch (WebException ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+
+        private void UpdateTimeZoneInfo(Model.TimeZoneInfo timeZoneInfo)
+        {
+            if (DateTime.TryParse(timeZoneInfo.Formatted, out DateTime dateTime))
+            {
+                DateTimeNow = dateTime;
+            }
         }
     }
 }

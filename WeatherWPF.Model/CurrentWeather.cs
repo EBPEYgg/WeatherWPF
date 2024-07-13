@@ -7,6 +7,9 @@ namespace WeatherWPF.Model
         [JsonProperty("temp_c")]
         public double TempC { get; set; }
 
+        [JsonProperty("temp_f")]
+        public double TempF { get; set; }
+
         [JsonProperty("condition")]
         public Condition Condition { get; set; }
 
