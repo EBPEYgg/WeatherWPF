@@ -9,7 +9,7 @@
         Title="Weather forecast" Height="685" Width="995" Icon="Resources/icon_app.png"
         Background="Transparent" WindowStyle="None" AllowsTransparency="True"
         WindowStartupLocation="CenterScreen" FontFamily="Cambria" 
-        MinWidth="995" MinHeight="685" ResizeMode="CanResizeWithGrip" MouseDown="Window_MouseDown">
+        MinWidth="995" MinHeight="685" ResizeMode="NoResize" MouseDown="Window_MouseDown">
     <Window.DataContext>
         <vm:MainVM/>
     </Window.DataContext>
@@ -21,7 +21,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border CornerRadius="30 0 0 30" Background="White">
+        <Border CornerRadius="30 0 0 30" Background="White" BorderBrush="#0079CB" BorderThickness=".8 .8 0 .8">
             <StackPanel>
                 <!-- Search -->
                 <Border BorderBrush="#d9d9d9" BorderThickness="1" CornerRadius="15" Width="200" HorizontalAlignment="Center" Margin="0 35 0 0">
@@ -31,17 +31,19 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <Image Source="Resources/explore.png" Height="18" Margin="5 0 0 0"/>
-                        <!--<TextBlock x:Name="SearchTextBlock" Text="Search ..." Style="{StaticResource HintText}"/>-->
+                        <Button Style="{StaticResource HoverOnButton}" Command="{Binding GetWeatherCommand}" Height="22" Width="22" Margin="5 0 0 0" BorderThickness="0" Padding="0">
+                            <Button.Background>
+                                <ImageBrush ImageSource="/Resources/explore.png" Stretch="Fill"/>
+                            </Button.Background>
+                        </Button>
                         <TextBox x:Name="SearchTextBox" Style="{StaticResource TextBox}" Text="{Binding CityName}"/>
-                        <Button Content="find" Style="{StaticResource Button}" Command="{Binding GetWeatherCommand}"/>
                     </Grid>
                 </Border>
 
                 <!-- Weather info shortly -->
                 <StackPanel Margin="50 60 0 0">
                     <Image Source="{Binding ConditionIcon}" Width="110" HorizontalAlignment="Left" />
-                    <TextBlock Text="{Binding TempC}" FontSize="46" Margin="0 20 0 0"/>
+                    <TextBlock Text="{Binding Temp}" FontSize="46" Margin="0 20 0 0"/>
                     <TextBlock Text="{Binding DateTimeNow}" FontSize="18" FontWeight="SemiBold" Margin="0 15 0 0"/>
                     <Separator Background="#dadada" Margin="3 30 40 30" Height="0.8"/>
                     <StackPanel Orientation="Horizontal">
@@ -50,7 +52,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0 15 0 77">
                         <Image Source="Resources/water.png" Width="20" Height="20"/>
-                        <TextBlock Text="Rain - 30%" FontSize="14" FontWeight="SemiBold" Margin="10 0 0 0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ChanceOfRainToday}" FontSize="14" FontWeight="SemiBold" Margin="10 0 0 0" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -60,7 +62,7 @@
                             <ImageBrush ImageSource="Resources/bg_city.png" Stretch="Fill" Opacity="0.65"/>
                         </Border.Background>
 
-                        <TextBlock Text="New York, NY, USA" Foreground="#FFFFFF" VerticalAlignment="Center" TextAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                        <TextBlock Text="{Binding Location}" Foreground="#FFFFFF" VerticalAlignment="Center" TextAlignment="Center" FontWeight="Bold" FontSize="14"/>
                     </Border>
                 </Border>
 
@@ -68,7 +70,7 @@
         </Border>
 
         <!-- Right side -->
-        <Border CornerRadius="0 30 30 0" Background="#f6f6f6" Grid.Column="1">
+        <Border CornerRadius="0 30 30 0" Background="#f6f6f6" Grid.Column="1" BorderBrush="#0079CB" BorderThickness="0 .8 .8 .8">
             <StackPanel>
                 <!--Top Menu-->
                 <Grid Margin="40 30 40 10">
@@ -79,7 +81,7 @@
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Content="°C" Style="{StaticResource Button}" Background="#1A1A1A" Foreground="#FFFFFF"/>
-                        <Button Content="°F" Style="{StaticResource Button}" Margin="10 0 0 0" Command="{Binding ConvertToFahrenheit}"/>
+                        <Button Content="°F" Style="{StaticResource Button}" Margin="10 0 0 0" Command="{Binding ConvertToFahrenheitCommand}"/>
                         <Button Content="✖" Style="{StaticResource Button}" Margin="10 0 0 0" Command="{Binding QuitCommand}"/>
                     </StackPanel>
                 </Grid>
@@ -116,7 +118,7 @@
 
                 <!--Widget Section-->
                 <WrapPanel Margin="40 0 0 0">
-                    <!--Widget 1-->
+                    <!--Widget 1 / UV Index -->
                     <Border Style="{StaticResource WidgetBorder}">
                         <StackPanel>
                             <TextBlock Text="UV Index" Style="{StaticResource TitleText}"/>
@@ -124,12 +126,12 @@
                             <Slider Style="{DynamicResource SliderStyle1}" VerticalAlignment="Bottom" Value="4" Maximum="10" Margin="0 12 0 0"/>
                             <Slider Style="{DynamicResource SliderStyle1}" VerticalAlignment="Bottom" Value="7" Maximum="10" Margin="0 5"/>
                             <Slider Style="{DynamicResource SliderStyle1}" VerticalAlignment="Bottom" Value="3" Maximum="10"/>
-                            <TextBlock Text="Average is 5" TextAlignment="Center" FontSize="12" Margin="0 3 0 0" Foreground="#9a9a9a"/>
+                            <TextBlock Text="{Binding UvIndex}" TextAlignment="Center" FontSize="12" Margin="0 3 0 0" Foreground="#9a9a9a"/>
 
                         </StackPanel>
                     </Border>
 
-                    <!--Widget 2-->
+                    <!--Widget 2 / Wind Status-->
                     <Border Style="{StaticResource WidgetBorder}">
                         <Grid>
                             <TextBlock Text="Wind Status" Style="{StaticResource TitleText}"/>
@@ -139,13 +141,18 @@
                                 <TextBlock Text="km/h" FontSize="14" VerticalAlignment="Bottom" Margin="5 0 0 3"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                                <Image Source="Resources/dir.png" Width="25" Height="25" Margin="0 0 10 0"/>
-                                <TextBlock Text="WSW" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                <Image Source="Resources/dir.png" Width="25" Height="25" Margin="0 0 10 0">
+                                    <Image.RenderTransform>
+                                        <RotateTransform Angle="{Binding WindDirectionAngle}" CenterX="12.5" CenterY="12.5"/>
+                                    </Image.RenderTransform>
+                                </Image>
+
+                                <TextBlock Text="{Binding WindDir}" FontWeight="SemiBold" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Grid>
                     </Border>
 
-                    <!--Widget 3-->
+                    <!--Widget 3 / Sunrise Sunset-->
                     <Border Style="{StaticResource WidgetBorder}">
                         <StackPanel>
                             <TextBlock Text="Sunrise Sunset" Style="{StaticResource TitleText}"/>
@@ -161,14 +168,14 @@
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0 10 0 0">
                                 <Image Source="Resources/sunset.png" Width="40" Height="40" Margin="0 0 10 0"/>
                                 <StackPanel>
-                                    <TextBlock Text="5:12 AM" FontSize="16" FontWeight="SemiBold"/>
+                                    <TextBlock Text="5:12 PM" FontSize="16" FontWeight="SemiBold"/>
                                     <TextBlock Text="+2m 15s" FontSize="12" Margin="0 2 0 0" Foreground="#a0a0a0"/>
                                 </StackPanel>
                             </StackPanel>
                         </StackPanel>
                     </Border>
 
-                    <!--Widget 4-->
+                    <!--Widget 4 / Humidity-->
                     <Border Style="{StaticResource WidgetBorder}">
                         <Grid>
                             <TextBlock Text="Humidity" Style="{StaticResource TitleText}"/>
@@ -181,16 +188,16 @@
                                 <Image Source="Resources/like.png" Width="18" Height="18" Margin="10 0 0 0"/>
                             </StackPanel>
 
-                            <Slider Style="{DynamicResource SliderStyle1}" Value="{Binding HumiditySlider}" Maximum="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90"/>
+                            <Slider Style="{DynamicResource SliderStyle1}" Value="{Binding Humidity}" Maximum="100" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90" IsEnabled="False"/>
                         </Grid>
                     </Border>
 
-                    <!--Widget 5-->
+                    <!--Widget 5 / Visibility-->
                     <Border Style="{StaticResource WidgetBorder}">
                         <Grid>
                             <TextBlock Text="Visibility" Style="{StaticResource TitleText}"/>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="5.2" FontSize="34" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding VisibilityKm}" FontSize="34" FontWeight="SemiBold"/>
                                 <TextBlock Text="km" FontSize="14" VerticalAlignment="Bottom" Margin="5 0 0 3"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
@@ -198,24 +205,24 @@
                                 <Image Source="Resources/happy.png" Width="18" Height="18" Margin="10 0 0 0"/>
                             </StackPanel>
 
-                            <Slider Style="{DynamicResource SliderStyle1}" Value="4" Maximum="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90"/>
+                            <Slider Style="{DynamicResource SliderStyle1}" Value="{Binding VisibilityKm}" Maximum="32" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90" IsEnabled="False"/>
                         </Grid>
                     </Border>
 
-                    <!--Widget 6-->
+                    <!--Widget 6 / Air Quality-->
                     <Border Style="{StaticResource WidgetBorder}">
                         <Grid>
-                            <TextBlock Text="Air Quality" Style="{StaticResource TitleText}"/>
+                            <TextBlock Text="Air Quality Index" Style="{StaticResource TitleText}"/>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="105" FontSize="34" FontWeight="SemiBold"/>
-                                <TextBlock Text="aqi" FontSize="14" VerticalAlignment="Bottom" Margin="5 0 0 3"/>
+                                <TextBlock Text="{Binding UsEpaIndex}" FontSize="34" FontWeight="SemiBold"/>
+                                <!--<TextBlock Text="aqi" FontSize="14" VerticalAlignment="Bottom" Margin="5 0 0 3"/>-->
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                                <TextBlock Text="Unhealthy" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding AirQualityAssessment}" FontWeight="SemiBold"/>
                                 <Image Source="Resources/dislike.png" Width="18" Height="18" Margin="10 0 0 0"/>
                             </StackPanel>
 
-                            <Slider Style="{DynamicResource SliderStyle1}" Value="7" Maximum="10" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90"/>
+                            <Slider Style="{DynamicResource SliderStyle1}" Value="{Binding UsEpaIndex}" Minimum="1" Maximum="6" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90" IsEnabled="False"/>
                         </Grid>
                     </Border>
 
@@ -224,4 +231,5 @@
             </StackPanel>
         </Border>
     </Grid>
+
 </Window>

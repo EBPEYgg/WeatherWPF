@@ -1,11 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Newtonsoft.Json;
-using System;
 using System.Globalization;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Timers;
 using WeatherWPF.Model;
 
 namespace WeatherWPF.ViewModel
@@ -27,10 +25,16 @@ namespace WeatherWPF.ViewModel
         private const string _apiKeyTimeZoneDB = "CUHLWKFUKN7W";
 
         /// <summary>
-        /// Текущее время.
+        /// Текущее время в формате YYYY-MM-DD hh:mm:ss.
         /// </summary>
         [ObservableProperty]
-        private DateTime _dateTimeNow;
+        private string _dateTimeNow;
+
+        /// <summary>
+        /// Полное название локации.
+        /// </summary>
+        [ObservableProperty]
+        private string _location;
 
         /// <summary>
         /// Название города.
@@ -55,7 +59,19 @@ namespace WeatherWPF.ViewModel
         private double _windSpeed;
 
         /// <summary>
-        /// Влажность.
+        /// Направление ветра.
+        /// </summary>
+        [ObservableProperty]
+        private string _windDir;
+
+        /// <summary>
+        /// Иконка направления ветра.
+        /// </summary>
+        [ObservableProperty]
+        private int _windDirectionAngle;
+
+        /// <summary>
+        /// Влажность в процентах.
         /// </summary>
         [ObservableProperty]
         private double _humidity;
@@ -67,10 +83,34 @@ namespace WeatherWPF.ViewModel
         private double _humiditySlider;
 
         /// <summary>
+        /// Средняя видимость в километрах.
+        /// </summary>
+        [ObservableProperty]
+        private double _visibilityKm;
+
+        /// <summary>
+        /// Преобразованное значение средней видимости для слайдера (от 0 до 10).
+        /// </summary>
+        [ObservableProperty]
+        private double _visibilityKmSlider;
+
+        /// <summary>
+        /// УФ-индекс.
+        /// </summary>
+        [ObservableProperty]
+        private string _uvIndex;
+
+        /// <summary>
+        /// Шанс того, что сегодня пойдет дождь.
+        /// </summary>
+        [ObservableProperty]
+        private string _chanceOfRainToday;
+
+        /// <summary>
         /// Количество градусов.
         /// </summary>
         [ObservableProperty]
-        private string _tempC;
+        private string _temp;
 
         /// <summary>
         /// Облачность.
@@ -85,12 +125,42 @@ namespace WeatherWPF.ViewModel
         private string _conditionIcon;
 
         /// <summary>
+        /// Индекс качества воздуха по стандарту US - EPA.
+        /// </summary>
+        [ObservableProperty]
+        private int _usEpaIndex;
+
+        /// <summary>
+        /// Словесная оценка качества воздуха по стандарту US - EPA.
+        /// </summary>
+        [ObservableProperty]
+        private string _airQualityAssessment;
+
+        /// <summary>
+        /// Преобразованное значение индекса качества воздуха для слайдера (от 1 до 10).
+        /// </summary>
+        [ObservableProperty]
+        private double _usEpaIndexSlider;
+
+        /// <summary>
+        /// Таймер.
+        /// </summary>
+        private System.Timers.Timer _timer;
+
+        /// <summary>
         /// Возвращает и задает команду для выхода из приложения.
         /// </summary>
         public RelayCommand QuitCommand { get; set; }
 
+        /// <summary>
+        /// Возвращает и задает команду для получения данных о погоде.
+        /// </summary>
         public RelayCommand GetWeatherCommand { get; set; }
 
+        /// <summary>
+        /// Возвращает и задает команду для изменения формата 
+        /// отображения градусов с Цельсия на Фаренгейт.
+        /// </summary>
         public RelayCommand ConvertToFahrenheitCommand { get; set; }
 
         /// <summary>
@@ -102,6 +172,10 @@ namespace WeatherWPF.ViewModel
             GetWeatherCommand = new RelayCommand(GetWeather);
             CityName = "London";
             GetWeatherCommand.Execute(this);
+
+            _timer = new System.Timers.Timer(1000);
+            _timer.Elapsed += TimerElapsed;
+            _timer.Start();
         }
 
         /// <inheritdoc cref="Environment.Exit(int)"/>
@@ -121,7 +195,7 @@ namespace WeatherWPF.ViewModel
                 Console.WriteLine($"{CityName} was not found.");
             }
 
-            string apiUrl = $"http://api.weatherapi.com/v1/current.json?key={_apiKeyWeather}&q={CityName}";
+            string apiUrl = $"http://api.weatherapi.com/v1/current.json?key={_apiKeyWeather}&q={CityName}&aqi=yes";
 
             try
             {
@@ -137,7 +211,6 @@ namespace WeatherWPF.ViewModel
                             string jsonResponse = reader.ReadToEnd();
                             WeatherData weatherData = JsonConvert.DeserializeObject<WeatherData>(jsonResponse);
                             DisplayWeatherData(weatherData);
-                            //GetTimeFromCoordinatesCommand.Execute(this);
                         }
                     }
                 }
@@ -154,16 +227,34 @@ namespace WeatherWPF.ViewModel
         /// <param name="weatherData">Данные о погоде.</param>
         private void DisplayWeatherData(WeatherData weatherData)
         {
-            TempC = Convert.ToInt32(weatherData.CurrentWeather.TempC) + "°c";
-            WindSpeed = weatherData.CurrentWeather.WindKph;
-            Humidity = weatherData.CurrentWeather.Humidity;
-            HumiditySlider = Humidity / 10;
-            ConditionText = weatherData.CurrentWeather.Condition.Text;
-            ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
+            if (weatherData != null
+                && weatherData.CurrentWeather != null
+                && weatherData.CurrentWeather.Condition != null)
+            {
+                Temp = Convert.ToInt32(weatherData.CurrentWeather.TempC) + "°c";
 
-            longitude = weatherData.Location.Lon.ToString("0.00", CultureInfo.InvariantCulture);
-            latitude = weatherData.Location.Lat.ToString("0.00", CultureInfo.InvariantCulture);
-            GetTimeFromCoordinates(longitude, latitude);
+                WindSpeed = weatherData.CurrentWeather.WindKph;
+                WindDir = weatherData.CurrentWeather.WindDirection;
+                WindDirectionAngle = GetWindDirectionAngle(weatherData.CurrentWeather.WindDegree);
+
+                Humidity = weatherData.CurrentWeather.Humidity;
+                HumiditySlider = Humidity / 10;
+
+                ConditionText = weatherData.CurrentWeather.Condition.Text;
+                ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
+
+                VisibilityKm = weatherData.CurrentWeather.VisibilityKm;
+                UvIndex = "Average is " + weatherData.CurrentWeather.UvIndex;
+                //ChanceOfRainToday = "Rain - " + weatherData.CurrentWeather.ChanceOfRainToday + "%";
+
+                UsEpaIndex = weatherData.CurrentWeather.AirQuality.UsEpaIndex;
+                AirQualityAssessment = GetAirQualityAssessment(UsEpaIndex);
+
+                Location = weatherData.Location.Name + ", " + weatherData.Location.Country;
+                longitude = weatherData.Location.Lon.ToString("0.00", CultureInfo.InvariantCulture);
+                latitude = weatherData.Location.Lat.ToString("0.00", CultureInfo.InvariantCulture);
+                GetTimeFromCoordinates(longitude, latitude);
+            }
         }
 
         /// <summary>
@@ -192,7 +283,8 @@ namespace WeatherWPF.ViewModel
                         {
                             string jsonResponse = await reader.ReadToEndAsync();
                             Model.TimeZoneInfo timeZoneInfo = JsonConvert.DeserializeObject<Model.TimeZoneInfo>(jsonResponse);
-                            UpdateTimeZoneInfo(timeZoneInfo);
+                            DateTimeNow = timeZoneInfo.Formatted;
+                            StartRealTimeClock(timeZoneInfo.Formatted);
                         }
                     }
                 }
@@ -203,12 +295,77 @@ namespace WeatherWPF.ViewModel
             }
         }
 
-        private void UpdateTimeZoneInfo(Model.TimeZoneInfo timeZoneInfo)
+        /// <summary>
+        /// Метод, который обновляет время каждую секунду.
+        /// </summary>
+        private void TimerElapsed(object sender, ElapsedEventArgs e)
         {
-            if (DateTime.TryParse(timeZoneInfo.Formatted, out DateTime dateTime))
+            if (DateTime.TryParse(DateTimeNow, out DateTime currentDateTime))
             {
-                DateTimeNow = dateTime;
+                currentDateTime = currentDateTime.AddSeconds(1);
+                DateTimeNow = currentDateTime.ToString("yyyy-MM-dd HH:mm:ss");
             }
+        }
+
+        /// <summary>
+        /// Метод, который запускает таймер с первоначальным значением времени.
+        /// </summary>
+        /// <param name="initialTime">Первоначальное значение времени.</param>
+        private void StartRealTimeClock(string initialTime)
+        {
+            if (DateTime.TryParse(initialTime, out DateTime initialDateTime))
+            {
+                DateTimeNow = initialDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+            }
+        }
+
+        /// <summary>
+        /// Метод, который разворачивает иконку в зависимости от направления ветра.
+        /// </summary>
+        /// <param name="windDegree">Направление ветра в градусах.</param>
+        /// <returns>Угол поворота иконки.</returns>
+        private int GetWindDirectionAngle(double windDegree)
+        {
+            return windDegree switch
+            {
+                >= 348.75 or < 11.25 => 0,     // N (337.5° - 22.5°)
+                >= 11.25 and < 33.75 => 23,    // NNE (22.5° - 45°)
+                >= 33.75 and < 56.25 => 45,    // NE (45° - 67.5°)
+                >= 56.25 and < 78.75 => 68,    // ENE (67.5° - 90°)
+                >= 78.75 and < 101.25 => 90,   // E (90° - 112.5°)
+                >= 101.25 and < 123.75 => 113, // ESE (112.5° - 135°)
+                >= 123.75 and < 146.25 => 135, // SE (135° - 157.5°)
+                >= 146.25 and < 168.75 => 158, // SSE (157.5° - 180°)
+                >= 168.75 and < 191.25 => 180, // S (180° - 202.5°)
+                >= 191.25 and < 213.75 => 203, // SSW (202.5° - 225°)
+                >= 213.75 and < 236.25 => 225, // SW (225° - 247.5°)
+                >= 236.25 and < 258.75 => 248, // WSW (247.5° - 270°)
+                >= 258.75 and < 281.25 => 270, // W (270° - 292.5°)
+                >= 281.25 and < 303.75 => 293, // WNW (292.5° - 315°)
+                >= 303.75 and < 326.25 => 315, // NW (315° - 337.5°)
+                >= 326.25 and < 348.75 => 338, // NNW (337.5° - 360°)
+                _ => 0                         // N по умолчанию
+            };
+        }
+
+        /// <summary>
+        /// Метод, который в зависимости от индекса качества воздуха 
+        /// по стандарту US - EPA дает словесную оценку качества воздуха.
+        /// </summary>
+        /// <param name="usEpaIndex">Индекс качества воздуха по стандарту US - EPA.</param>
+        /// <returns>Словесная оценка качества воздуха.</returns>
+        private string GetAirQualityAssessment(int usEpaIndex)
+        {
+            return usEpaIndex switch
+            {
+                1 => "Good",
+                2 => "Moderate",
+                3 => "Unhealthy for Sensitive Groups",
+                4 => "Unhealthy",
+                5 => "Very Unhealthy",
+                6 => "Hazardous",
+                _ => "Unknown",
+            };
         }
     }
 }
