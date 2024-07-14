@@ -207,6 +207,30 @@ namespace WeatherWPF.ViewModel
         private string _conditionIcon;
 
         /// <summary>
+        /// Изображение облачности утром в 6 часов.
+        /// </summary>
+        [ObservableProperty]
+        private string _conditionMorningIcon;
+
+        /// <summary>
+        /// Изображение облачности днем в 12 часов.
+        /// </summary>
+        [ObservableProperty]
+        private string _conditionDayIcon;
+
+        /// <summary>
+        /// Изображение облачности вечером в 6 часов.
+        /// </summary>
+        [ObservableProperty]
+        private string _conditionEveningIcon;
+
+        /// <summary>
+        /// Изображение облачности ночью в 12 часов.
+        /// </summary>
+        [ObservableProperty]
+        private string _conditionNightIcon;
+
+        /// <summary>
         /// Индекс качества воздуха по стандарту US - EPA.
         /// </summary>
         [ObservableProperty]
@@ -507,6 +531,10 @@ namespace WeatherWPF.ViewModel
 
             ConditionText = weatherData.CurrentWeather.Condition.Text;
             ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
+            ConditionMorningIcon = "https:" + todayForecast.Hour[6].Condition.Icon;
+            ConditionDayIcon = "https:" + todayForecast.Hour[12].Condition.Icon;
+            ConditionEveningIcon = "https:" + todayForecast.Hour[18].Condition.Icon;
+            ConditionNightIcon = "https:" + todayForecast.Hour[0].Condition.Icon;
 
             VisibilityKm = weatherData.CurrentWeather.VisibilityKm;
             UvIndex = $"Average is {weatherData.CurrentWeather.UvIndex}";

@@ -181,13 +181,13 @@
                     </Border>
                     <!--#endregion-->
                     
-                    
+
 
                     <!--#region Today forecast -->
                     <Border Style="{StaticResource ForecastBorder}" CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding TodayWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
                         <StackPanel>
                             <TextBlock Text="Morning" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
-                            <Image Source="Resources/sun.png" Width="30" Margin="0 10 0 10"/>
+                            <Image Source="{Binding ConditionMorningIcon}" Width="30" Margin="0 10 0 10"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <TextBlock Text="{Binding MorningTemp}" TextAlignment="Center" FontWeight="SemiBold"/>
                             </StackPanel>
@@ -197,7 +197,7 @@
                     <Border Style="{StaticResource ForecastBorder}" CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding TodayWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
                         <StackPanel>
                             <TextBlock Text="Daytime" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
-                            <Image Source="Resources/rain_cloud.png" Width="30" Margin="0 10 0 10"/>
+                            <Image Source="{Binding ConditionDayIcon}" Width="30" Margin="0 10 0 10"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <TextBlock Text="{Binding DayTemp}" TextAlignment="Center" FontWeight="SemiBold"/>
                             </StackPanel>
@@ -207,7 +207,7 @@
                     <Border Style="{StaticResource ForecastBorder}" CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding TodayWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
                         <StackPanel>
                             <TextBlock Text="Evening" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
-                            <Image Source="Resources/sun.png" Width="30" Margin="0 10 0 10"/>
+                            <Image Source="{Binding ConditionEveningIcon}" Width="30" Margin="0 10 0 10"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <TextBlock Text="{Binding EveningTemp}" TextAlignment="Center" FontWeight="SemiBold"/>
                             </StackPanel>
@@ -217,7 +217,7 @@
                     <Border Style="{StaticResource ForecastBorder}" CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding TodayWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
                         <StackPanel>
                             <TextBlock Text="Night" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
-                            <Image Source="Resources/storm.png" Width="30" Margin="0 10 0 10"/>
+                            <Image Source="{Binding ConditionNightIcon}" Width="30" Margin="0 10 0 10"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                 <TextBlock Text="{Binding NightTemp}" TextAlignment="Center" FontWeight="SemiBold"/>
                             </StackPanel>
