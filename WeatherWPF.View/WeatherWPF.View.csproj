@@ -18,6 +18,7 @@
     <None Remove="Resources\happy.png" />
     <None Remove="Resources\icon_app.png" />
     <None Remove="Resources\like.png" />
+    <None Remove="Resources\neutral_32x32.png" />
     <None Remove="Resources\rain.png" />
     <None Remove="Resources\rain_cloud.png" />
     <None Remove="Resources\snow.png" />
@@ -43,6 +44,7 @@
     <Resource Include="Resources\happy.png" />
     <Resource Include="Resources\icon_app.png" />
     <Resource Include="Resources\like.png" />
+    <Resource Include="Resources\neutral_32x32.png" />
     <Resource Include="Resources\rain.png" />
     <Resource Include="Resources\rain_cloud.png" />
     <Resource Include="Resources\snow.png" />
