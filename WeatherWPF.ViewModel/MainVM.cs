@@ -13,6 +13,7 @@ namespace WeatherWPF.ViewModel
     /// </summary>
     public partial class MainVM : ObservableObject
     {
+        #region API
         /// <summary>
         /// API ключ сервиса погоды.
         /// </summary>
@@ -23,7 +24,58 @@ namespace WeatherWPF.ViewModel
         /// о времени и дате для различных часовых поясов.
         /// </summary>
         private const string _apiKeyTimeZoneDB = "CUHLWKFUKN7W";
+        #endregion
 
+        #region Fields
+        /// <summary>
+        /// Черный цвет.
+        /// </summary>
+        private string _blackColor = "#1A1A1A";
+
+        /// <summary>
+        /// Белый цвет.
+        /// </summary>
+        private string _whiteColor = "#FFFFFF";
+
+        /// <summary>
+        /// Западная долгота города.
+        /// </summary>
+        private string longitude;
+
+        /// <summary>
+        /// Северная широта города.
+        /// </summary>
+        private string latitude;
+
+        /// <summary>
+        /// Количество градусов по Цельсию.
+        /// </summary>
+        private double _tempC;
+
+        /// <summary>
+        /// Количество градусов по Фаренгейту.
+        /// </summary>
+        private double _tempF;
+
+        /// <summary>
+        /// Таймер.
+        /// </summary>
+        private System.Timers.Timer _timer;
+        #endregion
+
+        #region Flags
+        /// <summary>
+        /// Флаг. Температура по Цельсию.
+        /// </summary>
+        private bool _isTempInCelsius = true;
+
+        /// <summary>
+        /// Флаг. Виджет прогноза погоды на неделю.
+        /// </summary>
+        private bool _isWeekForecast = true;
+        #endregion
+
+        #region Observable Property
         /// <summary>
         /// Текущее время в формате YYYY-MM-DD hh:mm:ss.
         /// </summary>
@@ -41,16 +93,6 @@ namespace WeatherWPF.ViewModel
         /// </summary>
         [ObservableProperty]
         private string _cityName;
-
-        /// <summary>
-        /// Западная долгота города.
-        /// </summary>
-        private string longitude;
-
-        /// <summary>
-        /// Северная широта города.
-        /// </summary>
-        private string latitude;
 
         /// <summary>
         /// Скорость ветра.
@@ -142,34 +184,48 @@ namespace WeatherWPF.ViewModel
         [ObservableProperty]
         private double _usEpaIndexSlider;
 
+        [ObservableProperty]
         /// <summary>
-        /// Таймер.
+        /// Цвет фона кнопки температуры по Цельсию.
         /// </summary>
-        private System.Timers.Timer _timer;
+        private string _tempCelsiusButtonBackground = "#1A1A1A";
+
+        [ObservableProperty]
+        /// <summary>
+        /// Цвет текста на кнопке температуры по Цельсию.
+        /// </summary>
+        private string _tempCelsiusButtonForeground = "White";
 
         /// <summary>
-        /// Возвращает и задает команду для выхода из приложения.
+        /// Цвет фона кнопки температуры по Фаренгейту.
         /// </summary>
-        public RelayCommand QuitCommand { get; set; }
+        [ObservableProperty]
+        private string _tempFahrenheitButtonBackground = "White";
 
         /// <summary>
-        /// Возвращает и задает команду для получения данных о погоде.
+        /// Цвет текста на кнопке температуры по Фаренгейту.
         /// </summary>
-        public RelayCommand GetWeatherCommand { get; set; }
+        [ObservableProperty]
+        private string _tempFahrenheitButtonForeground = "#1A1A1A";
 
         /// <summary>
-        /// Возвращает и задает команду для изменения формата 
-        /// отображения градусов с Цельсия на Фаренгейт.
+        /// Видимость раздела с прогнозом погоды на неделю.
         /// </summary>
-        public RelayCommand ConvertToFahrenheitCommand { get; set; }
+        [ObservableProperty]
+        private bool _weekWeatherVisibility = true;
+
+        /// <summary>
+        /// Видимость раздела с прогнозом погоды на день.
+        /// </summary>
+        [ObservableProperty]
+        private bool _todayWeatherVisibility = false;
+        #endregion
 
         /// <summary>
         /// Конструктор класса <see cref="MainVM"/>.
         /// </summary>
         public MainVM()
         {
-            QuitCommand = new RelayCommand(Quit);
-            GetWeatherCommand = new RelayCommand(GetWeather);
             CityName = "London";
             GetWeatherCommand.Execute(this);
 
@@ -178,17 +234,20 @@ namespace WeatherWPF.ViewModel
             _timer.Start();
         }
 
+        #region Commands
         /// <inheritdoc cref="Environment.Exit(int)"/>
+        [RelayCommand]
         private void Quit()
         {
             Environment.Exit(0);
         }
 
         /// <summary>
-        /// Метод, который получает JSON файл с погодой
+        /// Команда, которая получает JSON файл с погодой
         /// при помощи запроса на сервер.
         /// </summary>
-        private async void GetWeather()
+        [RelayCommand]
+        private async Task GetWeather()
         {
             if (string.IsNullOrEmpty(CityName))
             {
@@ -222,6 +281,72 @@ namespace WeatherWPF.ViewModel
         }
 
         /// <summary>
+        /// Команда, которая преобразует температуру из Фаренгейта в Цельсия.
+        /// </summary>
+        [RelayCommand]
+        private void ToggleTempToCelsius()
+        {
+            if (!_isTempInCelsius)
+            {
+                _isTempInCelsius = true;
+                Temp = Convert.ToInt32(_tempC) + "°c";
+                TempCelsiusButtonBackground = _blackColor;
+                TempCelsiusButtonForeground = _whiteColor;
+                TempFahrenheitButtonBackground = _whiteColor;
+                TempFahrenheitButtonForeground = _blackColor;
+            }
+        }
+
+        /// <summary>
+        /// Команда, которая преобразует температуру из Цельсия в Фаренгейта.
+        /// </summary>
+        [RelayCommand]
+        private void ToggleTempToFahrenheit()
+        {
+            if (_isTempInCelsius)
+            {
+                _isTempInCelsius = false;
+                Temp = Convert.ToInt32(_tempF) + "°F";
+                TempFahrenheitButtonBackground = _blackColor;
+                TempFahrenheitButtonForeground = _whiteColor;
+                TempCelsiusButtonBackground = _whiteColor;
+                TempCelsiusButtonForeground = _blackColor;
+            }
+        }
+
+        /// <summary>
+        /// Команда, которая переключает виджет погоды из состояния 
+        /// прогноз на сегодня на недельный прогноз и наоборот.
+        /// </summary>
+        [RelayCommand]
+        private void ToggleToTodayForecast()
+        {
+            if (!_isWeekForecast)
+            {
+                _isWeekForecast = true;
+                WeekWeatherVisibility = !WeekWeatherVisibility;
+                TodayWeatherVisibility = !TodayWeatherVisibility;
+            }
+        }
+
+        /// <summary>
+        /// Команда, которая переключает виджет погоды из состояния 
+        /// прогноз на сегодня на недельный прогноз и наоборот.
+        /// </summary>
+        [RelayCommand]
+        private void ToggleToWeekForecast()
+        {
+            if (_isWeekForecast)
+            {
+                _isWeekForecast = false;
+                TodayWeatherVisibility = !TodayWeatherVisibility;
+                WeekWeatherVisibility = !WeekWeatherVisibility;
+            }
+        }
+        #endregion
+
+        #region Methods
+        /// <summary>
         /// Метод, который отображает полученные данные о погоде на View.
         /// </summary>
         /// <param name="weatherData">Данные о погоде.</param>
@@ -231,7 +356,9 @@ namespace WeatherWPF.ViewModel
                 && weatherData.CurrentWeather != null
                 && weatherData.CurrentWeather.Condition != null)
             {
-                Temp = Convert.ToInt32(weatherData.CurrentWeather.TempC) + "°c";
+                _tempC = weatherData.CurrentWeather.TempC;
+                _tempF = weatherData.CurrentWeather.TempF;
+                Temp = Convert.ToInt32(_tempC) + "°c";
 
                 WindSpeed = weatherData.CurrentWeather.WindKph;
                 WindDir = weatherData.CurrentWeather.WindDirection;
@@ -257,6 +384,7 @@ namespace WeatherWPF.ViewModel
             }
         }
 
+        #region Display time
         /// <summary>
         /// Метод, который получает JSON файл с временем и датой 
         /// для указанного города при помощи запроса на сервер.
@@ -318,12 +446,14 @@ namespace WeatherWPF.ViewModel
                 DateTimeNow = initialDateTime.ToString("yyyy-MM-dd HH:mm:ss");
             }
         }
+        #endregion
 
         /// <summary>
         /// Метод, который разворачивает иконку в зависимости от направления ветра.
         /// </summary>
         /// <param name="windDegree">Направление ветра в градусах.</param>
         /// <returns>Угол поворота иконки.</returns>
+        // TODO: доделать
         private int GetWindDirectionAngle(double windDegree)
         {
             return windDegree switch
@@ -367,5 +497,6 @@ namespace WeatherWPF.ViewModel
                 _ => "Unknown",
             };
         }
+        #endregion
     }
 }

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WeatherWPF.View"
+        xmlns:converters="clr-namespace:WeatherWPF.View.Services"
         xmlns:vm="clr-namespace:WeatherWPF.ViewModel;assembly=WeatherWPF.ViewModel"
         mc:Ignorable="d"
         Title="Weather forecast" Height="685" Width="995" Icon="Resources/icon_app.png"
@@ -13,6 +14,10 @@
     <Window.DataContext>
         <vm:MainVM/>
     </Window.DataContext>
+
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Window.Resources>
 
     <Grid>
         <!-- Left side -->
@@ -75,20 +80,30 @@
                 <!--Top Menu-->
                 <Grid Margin="40 30 40 10">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                        <Label Content="Today" Style="{StaticResource TextButton}"/>
-                        <Label Content="Week" Style="{StaticResource ActiveTextButton}" Margin="15 0 0 0"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <Button Content="Week" Style="{StaticResource TextButton}" Command="{Binding ToggleToTodayForecastCommand}"/>
+                            <Rectangle HorizontalAlignment="Left" Height="1" Stroke="Black" VerticalAlignment="Top" Width="41" Margin="0,21,0,0" Visibility="{Binding WeekWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                            <Button Content="Today" Style="{StaticResource TextButton}" Margin="15 0 0 0" Command="{Binding ToggleToWeekForecastCommand}" Grid.Column="1"/>
+                            <Rectangle HorizontalAlignment="Left" Height="1" Stroke="Black" VerticalAlignment="Top" Width="44" Margin="15,21,0,0" Grid.Column="1" Visibility="{Binding TodayWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        </Grid>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Content="°C" Style="{StaticResource Button}" Background="#1A1A1A" Foreground="#FFFFFF"/>
-                        <Button Content="°F" Style="{StaticResource Button}" Margin="10 0 0 0" Command="{Binding ConvertToFahrenheitCommand}"/>
+                        <Button Content="°C" Style="{StaticResource Button}" Command="{Binding ToggleTempToCelsiusCommand}" Background="{Binding TempCelsiusButtonBackground}" Foreground="{Binding TempCelsiusButtonForeground}"/>
+                        <Button Content="°F" Style="{StaticResource Button}" Margin="10 0 0 0" Command="{Binding ToggleTempToFahrenheitCommand}" Background="{Binding TempFahrenheitButtonBackground}" Foreground="{Binding TempFahrenheitButtonForeground}"/>
                         <Button Content="✖" Style="{StaticResource Button}" Margin="10 0 0 0" Command="{Binding QuitCommand}"/>
                     </StackPanel>
                 </Grid>
 
                 <!--Week Days-->
                 <StackPanel Orientation="Horizontal" Margin="40 20 0 20">
-                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1">
+                    <!--#region Week forecast -->
+                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding WeekWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Border.Style>
                             <Style TargetType="Border">
                                 <Setter Property="Background" Value="White" />
@@ -96,7 +111,6 @@
 
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <!--<Setter Property="Background" Value="#F6F6F6" />-->
                                         <Setter Property="BorderBrush" Value="#03A9F4" />
                                     </Trigger>
                                 </Style.Triggers>
@@ -104,19 +118,262 @@
                         </Border.Style>
 
                         <StackPanel>
-                            <TextBlock Text="Monday" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            <TextBlock Text="Mon" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
                             <Image Source="Resources/sun.png" Width="30" Margin="0 10 0 10"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="16°" TextAlignment="Center" FontWeight="SemiBold" Margin="0 0 8 0"/>
-                                <TextBlock Text="3°" TextAlignment="Center" FontWeight="SemiBold" Foreground="#7a7a7a"/>
+                                <TextBlock Text="+16°" TextAlignment="Center" FontWeight="SemiBold" Margin="0 0 8 0"/>
+                                <TextBlock Text="+3°" TextAlignment="Center" FontWeight="SemiBold" Foreground="#7a7a7a"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
+
+                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding WeekWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="BorderBrush" Value="#e9e9e9" />
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#03A9F4" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <StackPanel>
+                            <TextBlock Text="Tue" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            <Image Source="Resources/sun_cloud.png" Width="30" Margin="0 10 0 10"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="+17°" TextAlignment="Center" FontWeight="SemiBold" Margin="0 0 8 0"/>
+                                <TextBlock Text="+7°" TextAlignment="Center" FontWeight="SemiBold" Foreground="#7a7a7a"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding WeekWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="BorderBrush" Value="#e9e9e9" />
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#03A9F4" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <StackPanel>
+                            <TextBlock Text="Wed" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            <Image Source="Resources/sun.png" Width="30" Margin="0 10 0 10"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="+23°" TextAlignment="Center" FontWeight="SemiBold" Margin="0 0 8 0"/>
+                                <TextBlock Text="+14°" TextAlignment="Center" FontWeight="SemiBold" Foreground="#7a7a7a"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding WeekWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="BorderBrush" Value="#e9e9e9" />
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#03A9F4" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <StackPanel>
+                            <TextBlock Text="Thu" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            <Image Source="Resources/cloud.png" Width="30" Margin="0 10 0 10"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="+19°" TextAlignment="Center" FontWeight="SemiBold" Margin="0 0 8 0"/>
+                                <TextBlock Text="+13°" TextAlignment="Center" FontWeight="SemiBold" Foreground="#7a7a7a"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding WeekWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="BorderBrush" Value="#e9e9e9" />
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#03A9F4" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <StackPanel>
+                            <TextBlock Text="Fri" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            <Image Source="Resources/rain_cloud.png" Width="30" Margin="0 10 0 10"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="+15°" TextAlignment="Center" FontWeight="SemiBold" Margin="0 0 8 0"/>
+                                <TextBlock Text="+6°" TextAlignment="Center" FontWeight="SemiBold" Foreground="#7a7a7a"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding WeekWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="BorderBrush" Value="#e9e9e9" />
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#03A9F4" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <StackPanel>
+                            <TextBlock Text="Sat" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            <Image Source="Resources/snow.png" Width="30" Margin="0 10 0 10"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="+12°" TextAlignment="Center" FontWeight="SemiBold" Margin="0 0 8 0"/>
+                                <TextBlock Text="-1°" TextAlignment="Center" FontWeight="SemiBold" Foreground="#7a7a7a"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding WeekWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="BorderBrush" Value="#e9e9e9" />
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#03A9F4" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <StackPanel>
+                            <TextBlock Text="Sun" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            <Image Source="Resources/rain.png" Width="30" Margin="0 10 0 10"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="+15°" TextAlignment="Center" FontWeight="SemiBold" Margin="0 0 8 0"/>
+                                <TextBlock Text="+3°" TextAlignment="Center" FontWeight="SemiBold" Foreground="#7a7a7a"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <!--#endregion-->
+                    
+                    
+
+
+
+                    <!--#region Today forecast -->
+                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding TodayWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="BorderBrush" Value="#e9e9e9" />
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#03A9F4" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <StackPanel>
+                            <TextBlock Text="Morning" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            <Image Source="Resources/sun.png" Width="30" Margin="0 10 0 10"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="+11°...+15°" TextAlignment="Center" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding TodayWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="BorderBrush" Value="#e9e9e9" />
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#03A9F4" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <StackPanel>
+                            <TextBlock Text="Daytime" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            <Image Source="Resources/rain_cloud.png" Width="30" Margin="0 10 0 10"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="+16°...+22°" TextAlignment="Center" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding TodayWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="BorderBrush" Value="#e9e9e9" />
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#03A9F4" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <StackPanel>
+                            <TextBlock Text="Evening" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            <Image Source="Resources/sun.png" Width="30" Margin="0 10 0 10"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="+22°...+23°" TextAlignment="Center" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border CornerRadius="10" Width="85" Padding="10" Margin="0 0 10 0" BorderThickness="1" Visibility="{Binding TodayWeatherVisibility, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="White" />
+                                <Setter Property="BorderBrush" Value="#e9e9e9" />
+
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="BorderBrush" Value="#03A9F4" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+
+                        <StackPanel>
+                            <TextBlock Text="Night" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
+                            <Image Source="Resources/storm.png" Width="30" Margin="0 10 0 10"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="+9°...+11°" TextAlignment="Center" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <!--#endregion-->
                 </StackPanel>
 
                 <TextBlock Text="Today's Highlights" FontSize="16" FontWeight="SemiBold" Margin="40 10 0 10"/>
 
-                <!--Widget Section-->
+                <!--#region Widget section -->
                 <WrapPanel Margin="40 0 0 0">
                     <!--Widget 1 / UV Index -->
                     <Border Style="{StaticResource WidgetBorder}">
@@ -227,6 +484,7 @@
                     </Border>
 
                 </WrapPanel>
+                <!--#endregion-->
 
             </StackPanel>
         </Border>
