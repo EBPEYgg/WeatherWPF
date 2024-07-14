@@ -12,5 +12,8 @@ namespace WeatherWPF.Model
 
         [JsonProperty("hour")]
         public List<Hour> Hour { get; set; }
+
+        [JsonProperty("astro")]
+        public Astro Astro { get; set; }
     }
 }

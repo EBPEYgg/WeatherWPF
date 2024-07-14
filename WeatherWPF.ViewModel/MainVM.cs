@@ -301,6 +301,18 @@ namespace WeatherWPF.ViewModel
         /// </summary>
         [ObservableProperty]
         private List<DailyForecast> _weekForecast;
+
+        /// <summary>
+        /// Время восхода солнца.
+        /// </summary>
+        [ObservableProperty]
+        private string _sunriseTime;
+
+        /// <summary>
+        /// Время захода солнца.
+        /// </summary>
+        [ObservableProperty]
+        private string _sunsetTime;
         #endregion
 
         /// <summary>
@@ -486,6 +498,9 @@ namespace WeatherWPF.ViewModel
             WindSpeed = weatherData.CurrentWeather.WindKph;
             WindDir = weatherData.CurrentWeather.WindDirection;
             WindDirectionAngle = GetWindDirectionAngle(weatherData.CurrentWeather.WindDegree);
+
+            SunriseTime = todayForecast.Astro.Sunrise;
+            SunsetTime = todayForecast.Astro.Sunset;
 
             Humidity = weatherData.CurrentWeather.Humidity;
             HumiditySlider = Humidity / 10;
