@@ -404,9 +404,9 @@ namespace WeatherWPF.ViewModel
                 _isTempInCelsius = true;
                 Temp = Convert.ToInt32(_tempC) + "°c";
                 MorningTemp = $"+{Convert.ToInt32(_morningTempC)}°";
-                DayTemp = $"+{Convert.ToInt32(_morningTempC)}°";
-                EveningTemp = $"+{Convert.ToInt32(_morningTempC)}°";
-                NightTemp = $"+{Convert.ToInt32(_morningTempC)}°";
+                DayTemp = $"+{Convert.ToInt32(_dayTempC)}°";
+                EveningTemp = $"+{Convert.ToInt32(_eveningTempC)}°";
+                NightTemp = $"+{Convert.ToInt32(_nightTempC)}°";
 
                 TempCelsiusButtonBackground = _blackColor;
                 TempCelsiusButtonForeground = _whiteColor;
