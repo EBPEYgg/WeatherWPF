@@ -37,10 +37,10 @@
         </Style>
 
         <!-- The text on the button -->
-        <Style x:Key="TextButton" TargetType="Label">
+        <Style x:Key="TextButton" TargetType="Button">
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Label">
+                    <ControlTemplate TargetType="Button">
                         <TextBlock FontSize="16" FontWeight="SemiBold" Foreground="#333333">
                             <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </TextBlock>
@@ -52,13 +52,13 @@
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Template">
                         <Setter.Value>
-                            <ControlTemplate TargetType="Label">
+                            <ControlTemplate TargetType="Button">
                                 <TextBlock FontSize="16" FontWeight="SemiBold" Foreground="#333333">
                                     <TextBlock.TextDecorations>
-                                        <TextDecoration Location="Underline" PenOffset="3" />
+                                        <TextDecoration Location="Underline" PenOffset="2" />
                                     </TextBlock.TextDecorations>
                                     
-                                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </TextBlock>
                             </ControlTemplate>
                         </Setter.Value>
@@ -68,16 +68,16 @@
         </Style>
 
         <!-- The text on the active button -->
-        <Style x:Key="ActiveTextButton" TargetType="Label" BasedOn="{StaticResource TextButton}">
+        <Style x:Key="ActiveTextButton" TargetType="Button" BasedOn="{StaticResource TextButton}">
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Label">
+                    <ControlTemplate TargetType="Button">
                         <TextBlock FontSize="16" FontWeight="SemiBold" Foreground="#333333">
                             <TextBlock.TextDecorations>
                                 <TextDecoration Location="Underline" PenOffset="3" />
                             </TextBlock.TextDecorations>
                                     
-                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </TextBlock>
                     </ControlTemplate>
                 </Setter.Value>
@@ -105,6 +105,7 @@
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#1A1A1A" />
                     <Setter Property="Foreground" Value="#FFFFFF" />
+                    <Setter Property="Opacity" Value="0.7" />
                 </Trigger>
             </Style.Triggers>
         </Style>
