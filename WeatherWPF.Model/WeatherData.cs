@@ -9,5 +9,8 @@ namespace WeatherWPF.Model
 
         [JsonProperty("current")]
         public CurrentWeather CurrentWeather { get; set; }
+
+        [JsonProperty("forecast")]
+        public Forecast Forecast { get; set; }
     }
 }

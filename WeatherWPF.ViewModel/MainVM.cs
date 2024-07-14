@@ -58,6 +58,46 @@ namespace WeatherWPF.ViewModel
         private double _tempF;
 
         /// <summary>
+        /// Количество градусов утром в 6 часов по Фаренгейту.
+        /// </summary>
+        private double _morningTempF;
+
+        /// <summary>
+        /// Количество градусов днем в 12 часов по Фаренгейту.
+        /// </summary>
+        private double _dayTempF;
+
+        /// <summary>
+        /// Количество градусов вечером в 18 часов по Фаренгейту.
+        /// </summary>
+        private double _eveningTempF;
+
+        /// <summary>
+        /// Количество градусов ночью в 0 часов по Фаренгейту.
+        /// </summary>
+        private double _nightTempF;
+
+        /// <summary>
+        /// Количество градусов утром в 6 часов по Цельсию.
+        /// </summary>
+        private double _morningTempC;
+
+        /// <summary>
+        /// Количество градусов днем в 12 часов по Цельсию.
+        /// </summary>
+        private double _dayTempC;
+
+        /// <summary>
+        /// Количество градусов вечером в 18 часов по Цельсию.
+        /// </summary>
+        private double _eveningTempC;
+
+        /// <summary>
+        /// Количество градусов ночью в 0 часов по Цельсию.
+        /// </summary>
+        private double _nightTempC;
+
+        /// <summary>
         /// Таймер.
         /// </summary>
         private System.Timers.Timer _timer;
@@ -143,7 +183,7 @@ namespace WeatherWPF.ViewModel
         private string _uvIndex;
 
         /// <summary>
-        /// Шанс того, что сегодня пойдет дождь.
+        /// Вероятность того, что сегодня пойдет дождь.
         /// </summary>
         [ObservableProperty]
         private string _chanceOfRainToday;
@@ -219,6 +259,48 @@ namespace WeatherWPF.ViewModel
         /// </summary>
         [ObservableProperty]
         private bool _todayWeatherVisibility = false;
+
+        /// <summary>
+        /// Температура утром в 6 часов.
+        /// </summary>
+        [ObservableProperty]
+        private string _morningTemp;
+
+        /// <summary>
+        /// Температура днем в 12 часов.
+        /// </summary>
+        [ObservableProperty]
+        private string _dayTemp;
+
+        /// <summary>
+        /// Температура вечером в 18 часов.
+        /// </summary>
+        [ObservableProperty]
+        private string _eveningTemp;
+
+        /// <summary>
+        /// Температура ночью в 0 часов.
+        /// </summary>
+        [ObservableProperty]
+        private string _nightTemp;
+
+        /// <summary>
+        /// Максимальная температура за день.
+        /// </summary>
+        [ObservableProperty]
+        private string _maxTemp;
+
+        /// <summary>
+        /// Минимальная температура за день.
+        /// </summary>
+        [ObservableProperty]
+        private string _minTemp;
+
+        /// <summary>
+        /// Прогноз погоды на неделю.
+        /// </summary>
+        [ObservableProperty]
+        private List<DailyForecast> _weekForecast;
         #endregion
 
         /// <summary>
@@ -254,7 +336,7 @@ namespace WeatherWPF.ViewModel
                 Console.WriteLine($"{CityName} was not found.");
             }
 
-            string apiUrl = $"http://api.weatherapi.com/v1/current.json?key={_apiKeyWeather}&q={CityName}&aqi=yes";
+            string apiUrl = $"http://api.weatherapi.com/v1/forecast.json?key={_apiKeyWeather}&q={CityName}&days=7&aqi=yes";
 
             try
             {
@@ -269,7 +351,26 @@ namespace WeatherWPF.ViewModel
                         {
                             string jsonResponse = reader.ReadToEnd();
                             WeatherData weatherData = JsonConvert.DeserializeObject<WeatherData>(jsonResponse);
-                            DisplayWeatherData(weatherData);
+
+                            if (weatherData != null
+                                && weatherData.CurrentWeather != null 
+                                && weatherData.CurrentWeather.Condition != null)
+                            {
+                                if (weatherData.Forecast != null 
+                                    && weatherData.Forecast.Forecastday.Count > 0)
+                                {
+                                    WeekForecast = weatherData.Forecast.Forecastday.Select(day => new DailyForecast
+                                    {
+                                        Date = day.Date,
+                                        MaxTempC = day.Day.MaxTempC,
+                                        MinTempC = day.Day.MinTempC,
+                                        MaxTempF = day.Day.MaxTempF,
+                                        MinTempF = day.Day.MinTempF
+                                    }).ToList();
+                                }
+                                DisplayWeatherData(weatherData);
+                                DisplayTimeData(weatherData);
+                            }
                         }
                     }
                 }
@@ -290,6 +391,11 @@ namespace WeatherWPF.ViewModel
             {
                 _isTempInCelsius = true;
                 Temp = Convert.ToInt32(_tempC) + "°c";
+                MorningTemp = $"+{Convert.ToInt32(_morningTempC)}°";
+                DayTemp = $"+{Convert.ToInt32(_morningTempC)}°";
+                EveningTemp = $"+{Convert.ToInt32(_morningTempC)}°";
+                NightTemp = $"+{Convert.ToInt32(_morningTempC)}°";
+
                 TempCelsiusButtonBackground = _blackColor;
                 TempCelsiusButtonForeground = _whiteColor;
                 TempFahrenheitButtonBackground = _whiteColor;
@@ -307,6 +413,11 @@ namespace WeatherWPF.ViewModel
             {
                 _isTempInCelsius = false;
                 Temp = Convert.ToInt32(_tempF) + "°F";
+                MorningTemp = $"+{Convert.ToInt32(_morningTempF)}°";
+                DayTemp = $"+{Convert.ToInt32(_dayTempF)}°";
+                EveningTemp = $"+{Convert.ToInt32(_eveningTempF)}°";
+                NightTemp = $"+{Convert.ToInt32(_nightTempF)}°";
+
                 TempFahrenheitButtonBackground = _blackColor;
                 TempFahrenheitButtonForeground = _whiteColor;
                 TempCelsiusButtonBackground = _whiteColor;
@@ -352,39 +463,57 @@ namespace WeatherWPF.ViewModel
         /// <param name="weatherData">Данные о погоде.</param>
         private void DisplayWeatherData(WeatherData weatherData)
         {
-            if (weatherData != null
-                && weatherData.CurrentWeather != null
-                && weatherData.CurrentWeather.Condition != null)
-            {
-                _tempC = weatherData.CurrentWeather.TempC;
-                _tempF = weatherData.CurrentWeather.TempF;
-                Temp = Convert.ToInt32(_tempC) + "°c";
+            _tempC = weatherData.CurrentWeather.TempC;
+            _tempF = weatherData.CurrentWeather.TempF;
+            Temp = Convert.ToInt32(_tempC) + "°c";
 
-                WindSpeed = weatherData.CurrentWeather.WindKph;
-                WindDir = weatherData.CurrentWeather.WindDirection;
-                WindDirectionAngle = GetWindDirectionAngle(weatherData.CurrentWeather.WindDegree);
+            var todayForecast = weatherData.Forecast.Forecastday[0];
+            _morningTempF = todayForecast.Hour[6].TempF;
+            _dayTempF = todayForecast.Hour[12].TempF;
+            _eveningTempF = todayForecast.Hour[18].TempF;
+            _nightTempF = todayForecast.Hour[0].TempF;
 
-                Humidity = weatherData.CurrentWeather.Humidity;
-                HumiditySlider = Humidity / 10;
+            _morningTempC = todayForecast.Hour[6].TempC;
+            _dayTempC = todayForecast.Hour[12].TempC;
+            _eveningTempC = todayForecast.Hour[18].TempC;
+            _nightTempC = todayForecast.Hour[0].TempC;
 
-                ConditionText = weatherData.CurrentWeather.Condition.Text;
-                ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
+            MorningTemp = $"+{Convert.ToInt32(todayForecast.Hour[6].TempC)}°";
+            DayTemp = $"+{Convert.ToInt32(todayForecast.Hour[12].TempC)}°";
+            EveningTemp = $"+{Convert.ToInt32(todayForecast.Hour[18].TempC)}°";
+            NightTemp = $"+{Convert.ToInt32(todayForecast.Hour[0].TempC)}°";
 
-                VisibilityKm = weatherData.CurrentWeather.VisibilityKm;
-                UvIndex = "Average is " + weatherData.CurrentWeather.UvIndex;
-                //ChanceOfRainToday = "Rain - " + weatherData.CurrentWeather.ChanceOfRainToday + "%";
+            WindSpeed = weatherData.CurrentWeather.WindKph;
+            WindDir = weatherData.CurrentWeather.WindDirection;
+            WindDirectionAngle = GetWindDirectionAngle(weatherData.CurrentWeather.WindDegree);
 
-                UsEpaIndex = weatherData.CurrentWeather.AirQuality.UsEpaIndex;
-                AirQualityAssessment = GetAirQualityAssessment(UsEpaIndex);
+            Humidity = weatherData.CurrentWeather.Humidity;
+            HumiditySlider = Humidity / 10;
 
-                Location = weatherData.Location.Name + ", " + weatherData.Location.Country;
-                longitude = weatherData.Location.Lon.ToString("0.00", CultureInfo.InvariantCulture);
-                latitude = weatherData.Location.Lat.ToString("0.00", CultureInfo.InvariantCulture);
-                GetTimeFromCoordinates(longitude, latitude);
-            }
+            ConditionText = weatherData.CurrentWeather.Condition.Text;
+            ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
+
+            VisibilityKm = weatherData.CurrentWeather.VisibilityKm;
+            UvIndex = $"Average is {weatherData.CurrentWeather.UvIndex}";
+            ChanceOfRainToday = $"Rain - {weatherData.Forecast.Forecastday[0].Day.DailyChanceOfRain}%";
+
+            UsEpaIndex = weatherData.CurrentWeather.AirQuality.UsEpaIndex;
+            AirQualityAssessment = GetAirQualityAssessment(UsEpaIndex);
         }
 
         #region Display time
+        /// <summary>
+        /// Метод, который отображает полученные данные о локальном времени на View.
+        /// </summary>
+        /// <param name="weatherData"></param>
+        private void DisplayTimeData(WeatherData weatherData)
+        {
+            Location = weatherData.Location.Name + ", " + weatherData.Location.Country;
+            longitude = weatherData.Location.Lon.ToString("0.00", CultureInfo.InvariantCulture);
+            latitude = weatherData.Location.Lat.ToString("0.00", CultureInfo.InvariantCulture);
+            GetTimeFromCoordinates(longitude, latitude);
+        }
+        
         /// <summary>
         /// Метод, который получает JSON файл с временем и датой 
         /// для указанного города при помощи запроса на сервер.
