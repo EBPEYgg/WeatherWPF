@@ -337,6 +337,13 @@ namespace WeatherWPF.ViewModel
         /// </summary>
         [ObservableProperty]
         private string _sunsetTime;
+
+        /// <summary>
+        /// Высота текствого блока словесной оценки 
+        /// качества воздуха и соответствующего смайла.
+        /// </summary>
+        [ObservableProperty]
+        private int _heightAirQualityTextBlock;
         #endregion
 
         /// <summary>
@@ -351,7 +358,7 @@ namespace WeatherWPF.ViewModel
             _timer.Elapsed += TimerElapsed;
             _timer.Start();
         }
-
+        
         #region Commands
         /// <inheritdoc cref="Environment.Exit(int)"/>
         [RelayCommand]
@@ -541,6 +548,8 @@ namespace WeatherWPF.ViewModel
             ChanceOfRainToday = $"Rain - {weatherData.Forecast.Forecastday[0].Day.DailyChanceOfRain}%";
 
             UsEpaIndex = weatherData.CurrentWeather.AirQuality.UsEpaIndex;
+            if (UsEpaIndex == 3) HeightAirQualityTextBlock = 30;
+            else HeightAirQualityTextBlock = 18;
             AirQualityAssessment = GetAirQualityAssessment(UsEpaIndex);
         }
 
