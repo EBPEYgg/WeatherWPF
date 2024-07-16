@@ -16,6 +16,7 @@
     <None Remove="Resources\exit_icon_64x64.png" />
     <None Remove="Resources\explore.png" />
     <None Remove="Resources\happy.png" />
+    <None Remove="Resources\icon_app.ico" />
     <None Remove="Resources\icon_app.png" />
     <None Remove="Resources\like.png" />
     <None Remove="Resources\neutral_32x32.png" />
@@ -31,6 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\WeatherWPF.ViewModel\WeatherWPF.ViewModel.csproj" />
   </ItemGroup>
 
@@ -42,6 +47,7 @@
     <Resource Include="Resources\exit_icon_64x64.png" />
     <Resource Include="Resources\explore.png" />
     <Resource Include="Resources\happy.png" />
+    <Resource Include="Resources\icon_app.ico" />
     <Resource Include="Resources\icon_app.png" />
     <Resource Include="Resources\like.png" />
     <Resource Include="Resources\neutral_32x32.png" />
