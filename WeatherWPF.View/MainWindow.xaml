@@ -303,8 +303,8 @@
                                 <TextBlock Text="%" FontSize="14" VerticalAlignment="Bottom" Margin="5,0,0,10"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                                <TextBlock Text="Normal" FontWeight="SemiBold"/>
-                                <Image Source="Resources/like.png" Width="18" Height="18" Margin="10 0 0 0"/>
+                                <TextBlock Text="{Binding HumidityAssessment}" FontWeight="SemiBold"/>
+                                <Image Source="{Binding HumiditySmileIcon}" Width="18" Height="18" Margin="10 0 0 0"/>
                             </StackPanel>
 
                             <Slider Style="{DynamicResource SliderStyle1}" Value="{Binding Humidity}" Maximum="100" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90" IsEnabled="False"/>
@@ -320,11 +320,11 @@
                                 <TextBlock Text="km" FontSize="14" VerticalAlignment="Bottom" Margin="5,0,0,10"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                                <TextBlock Text="Average" FontWeight="SemiBold"/>
-                                <Image Source="Resources/happy.png" Width="18" Height="18" Margin="10 0 0 0"/>
+                                <TextBlock Text="{Binding VisibilityAssessment}" FontWeight="SemiBold"/>
+                                <Image Source="{Binding VisibilitySmileIcon}" Width="18" Height="18" Margin="10 0 0 0"/>
                             </StackPanel>
 
-                            <Slider Style="{DynamicResource SliderStyle1}" Value="{Binding VisibilityKm}" Maximum="25" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90" IsEnabled="False"/>
+                            <Slider Style="{DynamicResource SliderStyle1}" Value="{Binding VisibilityKm}" Maximum="20" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90" IsEnabled="False"/>
                         </Grid>
                     </Border>
 
@@ -334,11 +334,11 @@
                             <TextBlock Text="Air Quality Index" Style="{StaticResource TitleText}"/>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding UsEpaIndex}" FontSize="34" FontWeight="SemiBold"/>
-                                <!--<TextBlock Text="aqi" FontSize="14" VerticalAlignment="Bottom" Margin="5 0 0 3"/>-->
+                                <!--<TextBlock Text="aqi" FontSize="14" VerticalAlignment="Bottom" Margin="5 0 0 10"/>-->
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                                 <TextBlock Text="{Binding AirQualityAssessment}" FontWeight="SemiBold" MaxWidth="105" Height="{Binding HeightAirQualityTextBlock}" TextWrapping="Wrap"/>
-                                <Image Source="Resources/dislike.png" Width="18" Height="18" Margin="10 0 0 0"/>
+                                <Image Source="{Binding AirQualitySmileIcon}" Width="18" Height="18" Margin="10 0 0 0"/>
                             </StackPanel>
 
                             <Slider Style="{DynamicResource SliderStyle1}" Value="{Binding UsEpaIndex}" Minimum="1" Maximum="6" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="90" IsEnabled="False"/>

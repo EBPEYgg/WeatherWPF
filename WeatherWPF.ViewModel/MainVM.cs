@@ -165,6 +165,18 @@ namespace WeatherWPF.ViewModel
         private double _humiditySlider;
 
         /// <summary>
+        /// Словесная оценка влажности на улице.
+        /// </summary>
+        [ObservableProperty]
+        private string _humidityAssessment;
+
+        /// <summary>
+        /// Оценка влажности в виде смайла.
+        /// </summary>
+        [ObservableProperty]
+        private string _humiditySmileIcon;
+
+        /// <summary>
         /// Средняя видимость в километрах.
         /// </summary>
         [ObservableProperty]
@@ -175,6 +187,18 @@ namespace WeatherWPF.ViewModel
         /// </summary>
         [ObservableProperty]
         private double _visibilityKmSlider;
+
+        /// <summary>
+        /// Словесная оценка видимости на улице.
+        /// </summary>
+        [ObservableProperty]
+        private string _visibilityAssessment;
+
+        /// <summary>
+        /// Оценка видимости в виде смайла.
+        /// </summary>
+        [ObservableProperty]
+        private string _visibilitySmileIcon;
 
         /// <summary>
         /// УФ-индекс.
@@ -237,16 +261,22 @@ namespace WeatherWPF.ViewModel
         private int _usEpaIndex;
 
         /// <summary>
+        /// Преобразованное значение индекса качества воздуха для слайдера (от 1 до 10).
+        /// </summary>
+        [ObservableProperty]
+        private double _usEpaIndexSlider;
+
+        /// <summary>
         /// Словесная оценка качества воздуха по стандарту US - EPA.
         /// </summary>
         [ObservableProperty]
         private string _airQualityAssessment;
 
         /// <summary>
-        /// Преобразованное значение индекса качества воздуха для слайдера (от 1 до 10).
+        /// Оценка качества воздуха в виде смайла.
         /// </summary>
         [ObservableProperty]
-        private double _usEpaIndexSlider;
+        private string _airQualitySmileIcon;
 
         [ObservableProperty]
         /// <summary>
@@ -506,10 +536,46 @@ namespace WeatherWPF.ViewModel
         /// <param name="weatherData">Данные о погоде.</param>
         private void DisplayWeatherData(WeatherData weatherData)
         {
+            DisplayTodayForecast(weatherData);
+
             _tempC = weatherData.CurrentWeather.TempC;
             _tempF = weatherData.CurrentWeather.TempF;
             Temp = Convert.ToInt32(_tempC) + "°c";
+            ChanceOfRainToday = $"Rain - {weatherData.Forecast.Forecastday[0].Day.DailyChanceOfRain}%";
+            ConditionText = weatherData.CurrentWeather.Condition.Text;
+            ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
 
+            UvIndex = $"Average is {weatherData.CurrentWeather.UvIndex}";
+
+            WindSpeed = weatherData.CurrentWeather.WindKph;
+            WindDir = weatherData.CurrentWeather.WindDirection;
+            WindDirectionAngle = GetWindDirectionAngle(weatherData.CurrentWeather.WindDegree);
+
+            SunriseTime = weatherData.Forecast.Forecastday[0].Astro.Sunrise;
+            SunsetTime = weatherData.Forecast.Forecastday[0].Astro.Sunset;
+
+            Humidity = weatherData.CurrentWeather.Humidity;
+            HumiditySlider = Humidity / 10;
+            HumidityAssessment = GetHumidityAssessment(Humidity);
+            HumiditySmileIcon = GetHumiditySmileIcon(Humidity);
+
+            VisibilityKm = weatherData.CurrentWeather.VisibilityKm;
+            VisibilityAssessment = GetVisibilityAssessment(VisibilityKm);
+            VisibilitySmileIcon = GetVisibilitySmileIcon(VisibilityKm);
+
+            UsEpaIndex = weatherData.CurrentWeather.AirQuality.UsEpaIndex;
+            if (UsEpaIndex == 3) HeightAirQualityTextBlock = 30;
+            else HeightAirQualityTextBlock = 18;
+            AirQualityAssessment = GetAirQualityAssessment(UsEpaIndex);
+            AirQualitySmileIcon = GetAirSmileIcon(UsEpaIndex);
+        }
+
+        /// <summary>
+        /// Метод, который отображает сегодняшний прогноз погоды на соответстующей вкладке.
+        /// </summary>
+        /// <param name="weatherData">Данные о погоде.</param>
+        private void DisplayTodayForecast(WeatherData weatherData)
+        {
             var todayForecast = weatherData.Forecast.Forecastday[0];
             _morningTempF = todayForecast.Hour[6].TempF;
             _dayTempF = todayForecast.Hour[12].TempF;
@@ -526,31 +592,10 @@ namespace WeatherWPF.ViewModel
             EveningTemp = $"+{Convert.ToInt32(todayForecast.Hour[18].TempC)}°";
             NightTemp = $"+{Convert.ToInt32(todayForecast.Hour[0].TempC)}°";
 
-            WindSpeed = weatherData.CurrentWeather.WindKph;
-            WindDir = weatherData.CurrentWeather.WindDirection;
-            WindDirectionAngle = GetWindDirectionAngle(weatherData.CurrentWeather.WindDegree);
-
-            SunriseTime = todayForecast.Astro.Sunrise;
-            SunsetTime = todayForecast.Astro.Sunset;
-
-            Humidity = weatherData.CurrentWeather.Humidity;
-            HumiditySlider = Humidity / 10;
-
-            ConditionText = weatherData.CurrentWeather.Condition.Text;
-            ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
             ConditionMorningIcon = "https:" + todayForecast.Hour[6].Condition.Icon;
             ConditionDayIcon = "https:" + todayForecast.Hour[12].Condition.Icon;
             ConditionEveningIcon = "https:" + todayForecast.Hour[18].Condition.Icon;
             ConditionNightIcon = "https:" + todayForecast.Hour[0].Condition.Icon;
-
-            VisibilityKm = weatherData.CurrentWeather.VisibilityKm;
-            UvIndex = $"Average is {weatherData.CurrentWeather.UvIndex}";
-            ChanceOfRainToday = $"Rain - {weatherData.Forecast.Forecastday[0].Day.DailyChanceOfRain}%";
-
-            UsEpaIndex = weatherData.CurrentWeather.AirQuality.UsEpaIndex;
-            if (UsEpaIndex == 3) HeightAirQualityTextBlock = 30;
-            else HeightAirQualityTextBlock = 18;
-            AirQualityAssessment = GetAirQualityAssessment(UsEpaIndex);
         }
 
         #region Display time
@@ -675,6 +720,90 @@ namespace WeatherWPF.ViewModel
                 4 => "Unhealthy",
                 5 => "Very Unhealthy",
                 6 => "Hazardous",
+                _ => "Unknown",
+            };
+        }
+
+        /// <summary>
+        /// Метод, который в зависимости от индекса качества воздуха 
+        /// определяет путь к подходящему смайлу.
+        /// </summary>
+        /// <param name="usEpaIndex">Индекс качества воздуха.</param>
+        /// <returns>Путь к иконке смайла.</returns>
+        private string GetAirSmileIcon(int usEpaIndex)
+        {
+            return usEpaIndex switch
+            {
+                1 or 2 => "Resources/like.png",
+                3 => "Resources/neutral_32x32.png",
+                4 or 5 or 6 => "Resources/dislike.png",
+                _ => "Unknown",
+            };
+        }
+
+        /// <summary>
+        /// Метод, который в зависимости от влажности 
+        /// воздуха дает ее словесную оценку.
+        /// </summary>
+        /// <param name="humidity">Влажность воздуха.</param>
+        /// <returns>Словесная оценка влажности воздуха.</returns>
+        private string GetHumidityAssessment(double humidity)
+        {
+            return humidity switch
+            {
+                >= 0 and <40 => "Air is dry",
+                >=40 and <=60 => "Normal",
+                >60 and <=100 => "Air is saturated",
+                _ => "Unknown",
+            };
+        }
+
+        /// <summary>
+        /// Метод, который в зависимости от влажности воздуха 
+        /// определяет путь к подходящему смайлу.
+        /// </summary>
+        /// <param name="humidity">Влажность воздуха.</param>
+        /// <returns>Путь к иконке смайла.</returns>
+        private string GetHumiditySmileIcon(double humidity)
+        {
+            return humidity switch
+            {
+                >= 0 and <30 => "Resources/dislike.png",
+                >=30 and <=70 => "Resources/like.png",
+                >70 and <=100 => "Resources/dislike.png",
+                _ => "Unknown",
+            };
+        }
+
+        /// <summary>
+        /// Метод, который в зависимости от дальности 
+        /// видимости дает ее словесную оценку.
+        /// </summary>
+        /// <param name="visibilityKm">Видимость.</param>
+        /// <returns>Словесная оценка текущей видимости.</returns>
+        private string GetVisibilityAssessment(double visibilityKm)
+        {
+            return visibilityKm switch
+            {
+                >=0 and <10 => "Bad",
+                >=10 and <16 => "Average",
+                >=16 => "Beatiful",
+                _ => "Unknown",
+            };
+        }
+
+        /// <summary>
+        /// Метод, который в зависимости от дальности видимости определяет путь к подходящему смайлу.
+        /// </summary>
+        /// <param name="visibilityKm">Видимость.</param>
+        /// <returns>Путь к иконке смайла.</returns>
+        private string GetVisibilitySmileIcon(double visibilityKm)
+        {
+            return visibilityKm switch
+            {
+                >=0 and <10 => "Resources/dislike.png",
+                >=10 and <16 => "Resources/like.png",
+                >=16 => "Resources/happy.png",
                 _ => "Unknown",
             };
         }
