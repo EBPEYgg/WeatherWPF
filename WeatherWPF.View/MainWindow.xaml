@@ -27,7 +27,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Tray icon -->
-        <tb:TaskbarIcon IconSource="Resources/icon_app.ico" ToolTipText="Weather forecast" MenuActivation="RightClick">
+        <tb:TaskbarIcon x:Name="TrayIcon" IconSource="Resources/icon_app.ico" ToolTipText="Weather forecast" MenuActivation="RightClick">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Show" Click="TaskbarIcon_TrayLeftMouseDown"/>

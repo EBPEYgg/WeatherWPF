@@ -11,6 +11,7 @@ namespace WeatherWPF.View
         public MainWindow()
         {
             InitializeComponent();
+            TrayIcon.Visibility = Visibility.Hidden;
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -29,6 +30,7 @@ namespace WeatherWPF.View
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Hide();
+            TrayIcon.Visibility = Visibility.Visible;
         }
     }
 }
