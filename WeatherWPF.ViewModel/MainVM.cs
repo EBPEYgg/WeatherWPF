@@ -58,44 +58,84 @@ namespace WeatherWPF.ViewModel
         private double _tempF;
 
         /// <summary>
-        /// Количество градусов утром в 6 часов по Фаренгейту.
+        /// Минимальная температура утром по Цельсию.
         /// </summary>
-        private double _morningTempF;
+        private double _minMorningTempC;
 
         /// <summary>
-        /// Количество градусов днем в 12 часов по Фаренгейту.
+        /// Максимальная температура утром по Цельсию.
         /// </summary>
-        private double _dayTempF;
+        private double _maxMorningTempC;
 
         /// <summary>
-        /// Количество градусов вечером в 18 часов по Фаренгейту.
+        /// Минимальная температура днем по Цельсию.
         /// </summary>
-        private double _eveningTempF;
+        private double _minDayTempC;
 
         /// <summary>
-        /// Количество градусов ночью в 0 часов по Фаренгейту.
+        /// Максимальная температура днем по Цельсию.
         /// </summary>
-        private double _nightTempF;
+        private double _maxDayTempC;
 
         /// <summary>
-        /// Количество градусов утром в 6 часов по Цельсию.
+        /// Минимальная температура вечером по Цельсию.
         /// </summary>
-        private double _morningTempC;
+        private double _minEveningTempC;
 
         /// <summary>
-        /// Количество градусов днем в 12 часов по Цельсию.
+        /// Максимальная температура вечером по Цельсию.
         /// </summary>
-        private double _dayTempC;
+        private double _maxEveningTempC;
 
         /// <summary>
-        /// Количество градусов вечером в 18 часов по Цельсию.
+        /// Минимальная температура ночью по Цельсию.
         /// </summary>
-        private double _eveningTempC;
+        private double _minNightTempC;
 
         /// <summary>
-        /// Количество градусов ночью в 0 часов по Цельсию.
+        /// Максимальная температура ночью по Цельсию.
         /// </summary>
-        private double _nightTempC;
+        private double _maxNightTempC;
+
+        /// <summary>
+        /// Минимальная температура утром по Фаренгейту.
+        /// </summary>
+        private double _minMorningTempF;
+
+        /// <summary>
+        /// Максимальная температура утром по Фаренгейту.
+        /// </summary>
+        private double _maxMorningTempF;
+
+        /// <summary>
+        /// Минимальная температура днем по Фаренгейту.
+        /// </summary>
+        private double _minDayTempF;
+
+        /// <summary>
+        /// Максимальная температура днем по Фаренгейту.
+        /// </summary>
+        private double _maxDayTempF;
+
+        /// <summary>
+        /// Минимальная температура вечером по Фаренгейту.
+        /// </summary>
+        private double _minEveningTempF;
+
+        /// <summary>
+        /// Максимальная температура вечером по Фаренгейту.
+        /// </summary>
+        private double _maxEveningTempF;
+
+        /// <summary>
+        /// Минимальная температура ночью по Фаренгейту.
+        /// </summary>
+        private double _minNightTempF;
+
+        /// <summary>
+        /// Максимальная температура ночью по Фаренгейту.
+        /// </summary>
+        private double _maxNightTempF;
 
         /// <summary>
         /// Таймер.
@@ -116,6 +156,12 @@ namespace WeatherWPF.ViewModel
         #endregion
 
         #region Observable Property
+        /// <summary>
+        /// Получены ли данные о погоде.
+        /// </summary>
+        [ObservableProperty]
+        private bool _isWeatherDataAvailable;
+
         /// <summary>
         /// Текущее время в формате YYYY-MM-DD hh:mm:ss.
         /// </summary>
@@ -339,6 +385,30 @@ namespace WeatherWPF.ViewModel
         private string _nightTemp;
 
         /// <summary>
+        /// TODO: xml.
+        /// </summary>
+        [ObservableProperty]
+        private string _morningTempRange;
+
+        /// <summary>
+        /// TODO: xml.
+        /// </summary>
+        [ObservableProperty]
+        private string _dayTempRange;
+
+        /// <summary>
+        /// TODO: xml.
+        /// </summary>
+        [ObservableProperty]
+        private string _eveningTempRange;
+
+        /// <summary>
+        /// TODO: xml.
+        /// </summary>
+        [ObservableProperty]
+        private string _nightTempRange;
+
+        /// <summary>
         /// Прогноз погоды на неделю.
         /// </summary>
         [ObservableProperty]
@@ -369,6 +439,7 @@ namespace WeatherWPF.ViewModel
         /// </summary>
         public MainVM()
         {
+            IsWeatherDataAvailable = false;
             CityName = "London";
             GetWeatherCommand.Execute(this);
 
@@ -430,6 +501,7 @@ namespace WeatherWPF.ViewModel
                                         Condition = day.Day.Condition
                                     }).ToList();
                                 }
+                                IsWeatherDataAvailable = true;
                                 DisplayWeatherData(weatherData);
                                 DisplayTimeData(weatherData);
                             }
@@ -452,11 +524,11 @@ namespace WeatherWPF.ViewModel
             if (!_isTempInCelsius)
             {
                 _isTempInCelsius = true;
-                Temp = Convert.ToInt32(_tempC) + "°c";
-                MorningTemp = FormatTemperature(_morningTempC);
-                DayTemp = FormatTemperature(_dayTempC);
-                EveningTemp = FormatTemperature(_eveningTempC);
-                NightTemp = FormatTemperature(_nightTempC);
+                Temp = Math.Round(_tempC) + "°c";
+                MorningTempRange = FormatTemperatureRange(_minMorningTempC, _maxMorningTempC);
+                DayTempRange = FormatTemperatureRange(_minDayTempC, _maxDayTempC);
+                EveningTempRange = FormatTemperatureRange(_minEveningTempC, _maxEveningTempC);
+                NightTempRange = FormatTemperatureRange(_minNightTempC, _maxNightTempC);
 
                 foreach (var forecast in WeekForecast)
                 {
@@ -479,11 +551,11 @@ namespace WeatherWPF.ViewModel
             if (_isTempInCelsius)
             {
                 _isTempInCelsius = false;
-                Temp = Convert.ToInt32(_tempF) + "°F";
-                MorningTemp = FormatTemperature(_morningTempF);
-                DayTemp = FormatTemperature(_dayTempF);
-                EveningTemp = FormatTemperature(_eveningTempF);
-                NightTemp = FormatTemperature(_nightTempF);
+                Temp = Math.Round(_tempF) + "°F";
+                MorningTempRange = FormatTemperatureRange(_minMorningTempF, _maxMorningTempF);
+                DayTempRange = FormatTemperatureRange(_minDayTempF, _maxDayTempF);
+                EveningTempRange = FormatTemperatureRange(_minEveningTempF, _maxEveningTempF);
+                NightTempRange = FormatTemperatureRange(_minNightTempF, _maxNightTempF);
 
                 foreach (var forecast in WeekForecast)
                 {
@@ -539,7 +611,7 @@ namespace WeatherWPF.ViewModel
 
             _tempC = weatherData.CurrentWeather.TempC;
             _tempF = weatherData.CurrentWeather.TempF;
-            Temp = Convert.ToInt32(_tempC) + "°c";
+            Temp = Math.Round(_tempC) + "°c";
             ChanceOfRainToday = $"Rain - {weatherData.Forecast.Forecastday[0].Day.DailyChanceOfRain}%";
             ConditionText = weatherData.CurrentWeather.Condition.Text;
             ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
@@ -581,20 +653,29 @@ namespace WeatherWPF.ViewModel
         private void DisplayTodayForecast(WeatherData weatherData)
         {
             var todayForecast = weatherData.Forecast.Forecastday[0];
-            _morningTempF = todayForecast.Hour[6].TempF;
-            _dayTempF = todayForecast.Hour[12].TempF;
-            _eveningTempF = todayForecast.Hour[18].TempF;
-            _nightTempF = todayForecast.Hour[0].TempF;
 
-            _morningTempC = todayForecast.Hour[6].TempC;
-            _dayTempC = todayForecast.Hour[12].TempC;
-            _eveningTempC = todayForecast.Hour[18].TempC;
-            _nightTempC = todayForecast.Hour[0].TempC;
+            _minMorningTempC = todayForecast.Hour.Take(6).Min(h => h.TempC);
+            _maxMorningTempC = todayForecast.Hour.Take(6).Max(h => h.TempC);
+            _minDayTempC = todayForecast.Hour.Skip(6).Take(6).Min(h => h.TempC);
+            _maxDayTempC = todayForecast.Hour.Skip(6).Take(6).Max(h => h.TempC);
+            _minEveningTempC = todayForecast.Hour.Skip(12).Take(6).Min(h => h.TempC);
+            _maxEveningTempC = todayForecast.Hour.Skip(12).Take(6).Max(h => h.TempC);
+            _minNightTempC = todayForecast.Hour.Skip(18).Take(6).Min(h => h.TempC);
+            _maxNightTempC = todayForecast.Hour.Skip(18).Take(6).Max(h => h.TempC);
 
-            MorningTemp = FormatTemperature(todayForecast.Hour[6].TempC);
-            DayTemp = FormatTemperature(todayForecast.Hour[12].TempC);
-            EveningTemp = FormatTemperature(todayForecast.Hour[18].TempC);
-            NightTemp = FormatTemperature(todayForecast.Hour[0].TempC);
+            _minMorningTempF = todayForecast.Hour.Take(6).Min(h => h.TempF);
+            _maxMorningTempF = todayForecast.Hour.Take(6).Max(h => h.TempF);
+            _minDayTempF = todayForecast.Hour.Skip(6).Take(6).Min(h => h.TempF);
+            _maxDayTempF = todayForecast.Hour.Skip(6).Take(6).Max(h => h.TempF);
+            _minEveningTempF = todayForecast.Hour.Skip(12).Take(6).Min(h => h.TempF);
+            _maxEveningTempF = todayForecast.Hour.Skip(12).Take(6).Max(h => h.TempF);
+            _minNightTempF = todayForecast.Hour.Skip(18).Take(6).Min(h => h.TempF);
+            _maxNightTempF = todayForecast.Hour.Skip(18).Take(6).Max(h => h.TempF);
+
+            MorningTempRange = FormatTemperatureRange(_minMorningTempC, _maxMorningTempC);
+            DayTempRange = FormatTemperatureRange(_minDayTempC, _maxDayTempC);
+            EveningTempRange = FormatTemperatureRange(_minEveningTempC, _maxEveningTempC);
+            NightTempRange = FormatTemperatureRange(_minNightTempC, _maxNightTempC);
 
             ConditionMorningIcon = todayForecast.Hour[6].Condition.IconUrl;
             ConditionDayIcon = todayForecast.Hour[12].Condition.IconUrl;
@@ -822,7 +903,18 @@ namespace WeatherWPF.ViewModel
         {
             var sign = temperature > 0 ? "+" : "-";
             if (temperature == 0) sign = "";
-            return $"{sign}{Convert.ToInt32(temperature)}°";
+            return $"{sign}{Math.Round(temperature)}°";
+        }
+
+        /// <summary>
+        /// Метод, который преобразует значения температур в нужный вид.
+        /// </summary>
+        /// <param name="minTemp">Минимальная температура за определенное время суток.</param>
+        /// <param name="maxTemp">Максимальная температура за определенное время суток.</param>
+        /// <returns>Строка формата '+{minTemp}°...+{maxTemp}°'.</returns>
+        private string FormatTemperatureRange(double minTemp, double maxTemp)
+        {
+            return $"+{Math.Round(minTemp)}°...+{Math.Round(maxTemp)}°";
         }
         #endregion
     }

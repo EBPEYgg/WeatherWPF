@@ -67,8 +67,8 @@
                         <Image Source="{Binding ConditionIcon}" Width="20" Height="20"/>
                         <TextBlock Text="{Binding ConditionText}" FontSize="14" FontWeight="SemiBold" Margin="10 0 0 0" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,15,0,103">
-                        <Image Source="Resources/water.png" Width="20" Height="20"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,15,0,102">
+                        <Image Source="Resources/water.png" Width="20" Height="20" Visibility="{Binding IsWeatherDataAvailable, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         <TextBlock Text="{Binding ChanceOfRainToday}" FontSize="14" FontWeight="SemiBold" Margin="10 0 0 0" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
@@ -147,7 +147,7 @@
                             <TextBlock Text="Morning" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
                             <Image Source="{Binding ConditionMorningIcon}" Width="30" Margin="0 10 0 10"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding MorningTemp}" TextAlignment="Center" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding MorningTempRange}" TextAlignment="Center" FontWeight="SemiBold"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -157,7 +157,7 @@
                             <TextBlock Text="Daytime" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
                             <Image Source="{Binding ConditionDayIcon}" Width="30" Margin="0 10 0 10"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding DayTemp}" TextAlignment="Center" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding DayTempRange}" TextAlignment="Center" FontWeight="SemiBold"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -167,7 +167,7 @@
                             <TextBlock Text="Evening" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
                             <Image Source="{Binding ConditionEveningIcon}" Width="30" Margin="0 10 0 10"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding EveningTemp}" TextAlignment="Center" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding EveningTempRange}" TextAlignment="Center" FontWeight="SemiBold"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
@@ -177,7 +177,7 @@
                             <TextBlock Text="Night" TextAlignment="Center" FontSize="14" FontWeight="SemiBold"/>
                             <Image Source="{Binding ConditionNightIcon}" Width="30" Margin="0 10 0 10"/>
                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <TextBlock Text="{Binding NightTemp}" TextAlignment="Center" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding NightTempRange}" TextAlignment="Center" FontWeight="SemiBold"/>
                             </StackPanel>
                         </StackPanel>
                     </Border>
