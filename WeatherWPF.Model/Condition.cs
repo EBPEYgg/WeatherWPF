@@ -9,5 +9,13 @@ namespace WeatherWPF.Model
 
         [JsonProperty("icon")]
         public string Icon { get; set; }
+
+        public string IconUrl
+        {
+            get
+            {
+                return $"https:{Icon}";
+            }
+        }
     }
 }

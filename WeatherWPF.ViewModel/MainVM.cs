@@ -339,18 +339,6 @@ namespace WeatherWPF.ViewModel
         private string _nightTemp;
 
         /// <summary>
-        /// Максимальная температура за день.
-        /// </summary>
-        [ObservableProperty]
-        private string _maxTemp;
-
-        /// <summary>
-        /// Минимальная температура за день.
-        /// </summary>
-        [ObservableProperty]
-        private string _minTemp;
-
-        /// <summary>
         /// Прогноз погоды на неделю.
         /// </summary>
         [ObservableProperty]
@@ -438,7 +426,8 @@ namespace WeatherWPF.ViewModel
                                         MaxTempC = day.Day.MaxTempC,
                                         MinTempC = day.Day.MinTempC,
                                         MaxTempF = day.Day.MaxTempF,
-                                        MinTempF = day.Day.MinTempF
+                                        MinTempF = day.Day.MinTempF,
+                                        Condition = day.Day.Condition
                                     }).ToList();
                                 }
                                 DisplayWeatherData(weatherData);
@@ -464,10 +453,15 @@ namespace WeatherWPF.ViewModel
             {
                 _isTempInCelsius = true;
                 Temp = Convert.ToInt32(_tempC) + "°c";
-                MorningTemp = $"+{Convert.ToInt32(_morningTempC)}°";
-                DayTemp = $"+{Convert.ToInt32(_dayTempC)}°";
-                EveningTemp = $"+{Convert.ToInt32(_eveningTempC)}°";
-                NightTemp = $"+{Convert.ToInt32(_nightTempC)}°";
+                MorningTemp = FormatTemperature(_morningTempC);
+                DayTemp = FormatTemperature(_dayTempC);
+                EveningTemp = FormatTemperature(_eveningTempC);
+                NightTemp = FormatTemperature(_nightTempC);
+
+                foreach (var forecast in WeekForecast)
+                {
+                    forecast.UpdateTemperatureDisplay(_isTempInCelsius);
+                }
 
                 TempCelsiusButtonBackground = _blackColor;
                 TempCelsiusButtonForeground = _whiteColor;
@@ -486,10 +480,15 @@ namespace WeatherWPF.ViewModel
             {
                 _isTempInCelsius = false;
                 Temp = Convert.ToInt32(_tempF) + "°F";
-                MorningTemp = $"+{Convert.ToInt32(_morningTempF)}°";
-                DayTemp = $"+{Convert.ToInt32(_dayTempF)}°";
-                EveningTemp = $"+{Convert.ToInt32(_eveningTempF)}°";
-                NightTemp = $"+{Convert.ToInt32(_nightTempF)}°";
+                MorningTemp = FormatTemperature(_morningTempF);
+                DayTemp = FormatTemperature(_dayTempF);
+                EveningTemp = FormatTemperature(_eveningTempF);
+                NightTemp = FormatTemperature(_nightTempF);
+
+                foreach (var forecast in WeekForecast)
+                {
+                    forecast.UpdateTemperatureDisplay(_isTempInCelsius);
+                }
 
                 TempFahrenheitButtonBackground = _blackColor;
                 TempFahrenheitButtonForeground = _whiteColor;
@@ -545,6 +544,11 @@ namespace WeatherWPF.ViewModel
             ConditionText = weatherData.CurrentWeather.Condition.Text;
             ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
 
+            foreach (var forecast in WeekForecast)
+            {
+                forecast.UpdateTemperatureDisplay(_isTempInCelsius);
+            }
+
             UvIndex = $"Average is {weatherData.CurrentWeather.UvIndex}";
 
             WindSpeed = weatherData.CurrentWeather.WindKph;
@@ -587,15 +591,15 @@ namespace WeatherWPF.ViewModel
             _eveningTempC = todayForecast.Hour[18].TempC;
             _nightTempC = todayForecast.Hour[0].TempC;
 
-            MorningTemp = $"+{Convert.ToInt32(todayForecast.Hour[6].TempC)}°";
-            DayTemp = $"+{Convert.ToInt32(todayForecast.Hour[12].TempC)}°";
-            EveningTemp = $"+{Convert.ToInt32(todayForecast.Hour[18].TempC)}°";
-            NightTemp = $"+{Convert.ToInt32(todayForecast.Hour[0].TempC)}°";
+            MorningTemp = FormatTemperature(todayForecast.Hour[6].TempC);
+            DayTemp = FormatTemperature(todayForecast.Hour[12].TempC);
+            EveningTemp = FormatTemperature(todayForecast.Hour[18].TempC);
+            NightTemp = FormatTemperature(todayForecast.Hour[0].TempC);
 
-            ConditionMorningIcon = "https:" + todayForecast.Hour[6].Condition.Icon;
-            ConditionDayIcon = "https:" + todayForecast.Hour[12].Condition.Icon;
-            ConditionEveningIcon = "https:" + todayForecast.Hour[18].Condition.Icon;
-            ConditionNightIcon = "https:" + todayForecast.Hour[0].Condition.Icon;
+            ConditionMorningIcon = todayForecast.Hour[6].Condition.IconUrl;
+            ConditionDayIcon = todayForecast.Hour[12].Condition.IconUrl;
+            ConditionEveningIcon = todayForecast.Hour[18].Condition.IconUrl;
+            ConditionNightIcon = todayForecast.Hour[0].Condition.IconUrl;
         }
 
         #region Display time
@@ -751,9 +755,9 @@ namespace WeatherWPF.ViewModel
         {
             return humidity switch
             {
-                >= 0 and <40 => "Air is dry",
-                >=40 and <=60 => "Normal",
-                >60 and <=100 => "Air is saturated",
+                >= 0 and <30 => "Air is dry",
+                >=30 and <=70 => "Normal",
+                >70 and <=100 => "Air is saturated",
                 _ => "Unknown",
             };
         }
@@ -806,6 +810,19 @@ namespace WeatherWPF.ViewModel
                 >=16 => "Resources/happy.png",
                 _ => "Unknown",
             };
+        }
+
+        /// <summary>
+        /// Метод, который преобразует значение температуры в нужный вид.
+        /// </summary>
+        /// <param name="temperature">Значение температуры.</param>
+        /// <returns>Строка, содержащая знак температуры, 
+        /// целочисленное значение температуры и знак градуса.</returns>
+        private string FormatTemperature(double temperature)
+        {
+            var sign = temperature > 0 ? "+" : "-";
+            if (temperature == 0) sign = "";
+            return $"{sign}{Convert.ToInt32(temperature)}°";
         }
         #endregion
     }

@@ -18,5 +18,9 @@ namespace WeatherWPF.Model
 
         [JsonProperty("daily_chance_of_rain")]
         public double DailyChanceOfRain { get; set; }
+
+        public Condition Condition { get; set; }
+
+        public string ConditionIconUrl { get => $"https:{Condition?.Icon}"; }
     }
 }
