@@ -110,6 +110,15 @@
             </Style.Triggers>
         </Style>
         
+        <!-- Close button -->
+        <Style x:Key="CloseButton" TargetType="Button" BasedOn="{StaticResource Button}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="1.0" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <!-- Hover on the button -->
         <Style x:Key="HoverOnButton" TargetType="Button">
             <Setter Property="Template">

@@ -109,7 +109,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Content="°C" Style="{StaticResource Button}" Command="{Binding ToggleTempToCelsiusCommand}" Background="{Binding TempCelsiusButtonBackground}" Foreground="{Binding TempCelsiusButtonForeground}"/>
                         <Button Content="°F" Style="{StaticResource Button}" Margin="10 0 0 0" Command="{Binding ToggleTempToFahrenheitCommand}" Background="{Binding TempFahrenheitButtonBackground}" Foreground="{Binding TempFahrenheitButtonForeground}"/>
-                        <Button Content="✖" Style="{StaticResource Button}" Margin="10 0 0 0" x:Name="CloseButton" Click="CloseButton_Click"/>
+                        <Button Content="✖" Style="{StaticResource CloseButton}" Margin="10 0 0 0" x:Name="CloseButton" Click="CloseButton_Click"/>
                     </StackPanel>
                 </Grid>
 
