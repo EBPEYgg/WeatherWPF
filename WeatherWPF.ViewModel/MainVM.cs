@@ -385,25 +385,25 @@ namespace WeatherWPF.ViewModel
         private string _nightTemp;
 
         /// <summary>
-        /// TODO: xml.
+        /// Диапазон значений температуры за утро.
         /// </summary>
         [ObservableProperty]
         private string _morningTempRange;
 
         /// <summary>
-        /// TODO: xml.
+        /// Диапазон значений температуры за день.
         /// </summary>
         [ObservableProperty]
         private string _dayTempRange;
 
         /// <summary>
-        /// TODO: xml.
+        /// Диапазон значений температуры за вечер.
         /// </summary>
         [ObservableProperty]
         private string _eveningTempRange;
 
         /// <summary>
-        /// TODO: xml.
+        /// Диапазон значений температуры за ночь.
         /// </summary>
         [ObservableProperty]
         private string _nightTempRange;
