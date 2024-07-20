@@ -20,7 +20,7 @@ namespace WeatherWPF.Model
         public int WindDegree { get; set; } = 0;
 
         [JsonProperty("wind_dir")]
-        public string WindDirection { get; set; } = "";
+        public string WindDirection { get; set; } = "Unknown";
 
         [JsonProperty("humidity")]
         public double Humidity { get; set; } = 0;
