@@ -169,6 +169,12 @@ namespace WeatherWPF.ViewModel
         private string _dateTimeNow;
 
         /// <summary>
+        /// Текущий день недели.
+        /// </summary>
+        [ObservableProperty]
+        private string _currentDayOfWeek;
+
+        /// <summary>
         /// Полное название локации.
         /// </summary>
         [ObservableProperty]
@@ -611,7 +617,7 @@ namespace WeatherWPF.ViewModel
 
             _tempC = weatherData.CurrentWeather.TempC;
             _tempF = weatherData.CurrentWeather.TempF;
-            Temp = Math.Round(_tempC) + "°c";
+            Temp = FormatTemperature(_tempC);
             ChanceOfRainToday = $"Rain - {weatherData.Forecast.Forecastday[0].Day.DailyChanceOfRain}%";
             ConditionText = weatherData.CurrentWeather.Condition.Text;
             ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
@@ -743,6 +749,7 @@ namespace WeatherWPF.ViewModel
             {
                 currentDateTime = currentDateTime.AddSeconds(1);
                 DateTimeNow = currentDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+                CurrentDayOfWeek = currentDateTime.DayOfWeek.ToString();
             }
         }
 

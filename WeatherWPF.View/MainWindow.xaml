@@ -62,12 +62,13 @@
                     <Image Source="{Binding ConditionIcon}" Width="110" HorizontalAlignment="Left" />
                     <TextBlock Text="{Binding Temp}" FontSize="46" Margin="0 20 0 0"/>
                     <TextBlock Text="{Binding DateTimeNow}" FontSize="18" FontWeight="SemiBold" Margin="0 15 0 0"/>
+                    <TextBlock Text="{Binding CurrentDayOfWeek}" FontSize="18" FontWeight="SemiBold" Margin="0,10,0,0"/>
                     <Separator Background="#dadada" Margin="3 30 40 30" Height="0.8"/>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="{Binding ConditionIcon}" Width="20" Height="20"/>
                         <TextBlock Text="{Binding ConditionText}" FontSize="14" FontWeight="SemiBold" Margin="10 0 0 0" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,15,0,102">
+                    <StackPanel Orientation="Horizontal" Margin="0,15,0,70">
                         <Image Source="Resources/water.png" Width="20" Height="20" Visibility="{Binding IsWeatherDataAvailable, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         <TextBlock Text="{Binding ChanceOfRainToday}" FontSize="14" FontWeight="SemiBold" Margin="10 0 0 0" VerticalAlignment="Center"/>
                     </StackPanel>
