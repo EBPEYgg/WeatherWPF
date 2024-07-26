@@ -70,7 +70,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" Margin="0,15,0,70">
                         <Image Source="Resources/water.png" Width="20" Height="20" Visibility="{Binding IsWeatherDataAvailable, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                        <TextBlock Text="{Binding ChanceOfRainToday}" FontSize="14" FontWeight="SemiBold" Margin="10 0 0 0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ChanceOfRainToday, StringFormat='Rain - {0}%'}" FontSize="14" FontWeight="SemiBold" Margin="10 0 0 0" VerticalAlignment="Center"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -197,7 +197,7 @@
                             <Slider Style="{DynamicResource SliderStyle1}" VerticalAlignment="Bottom" Value="4" Maximum="10" Margin="0 12 0 0"/>
                             <Slider Style="{DynamicResource SliderStyle1}" VerticalAlignment="Bottom" Value="7" Maximum="10" Margin="0 5"/>
                             <Slider Style="{DynamicResource SliderStyle1}" VerticalAlignment="Bottom" Value="3" Maximum="10"/>
-                            <TextBlock Text="{Binding UvIndex}" TextAlignment="Center" FontSize="12" Margin="0,6,0,0" Foreground="#9a9a9a"/>
+                            <TextBlock Text="{Binding UvIndex, StringFormat='Average is {0}'}" TextAlignment="Center" FontSize="12" Margin="0,6,0,0" Foreground="#9a9a9a"/>
 
                         </StackPanel>
                     </Border>

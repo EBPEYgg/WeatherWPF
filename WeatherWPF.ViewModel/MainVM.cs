@@ -256,13 +256,13 @@ namespace WeatherWPF.ViewModel
         /// УФ-индекс.
         /// </summary>
         [ObservableProperty]
-        private string _uvIndex;
+        private double _uvIndex;
 
         /// <summary>
         /// Вероятность того, что сегодня пойдет дождь.
         /// </summary>
         [ObservableProperty]
-        private string _chanceOfRainToday;
+        private double _chanceOfRainToday;
 
         /// <summary>
         /// Количество градусов.
@@ -367,30 +367,6 @@ namespace WeatherWPF.ViewModel
         private bool _todayWeatherVisibility = false;
 
         /// <summary>
-        /// Температура утром в 6 часов.
-        /// </summary>
-        [ObservableProperty]
-        private string _morningTemp;
-
-        /// <summary>
-        /// Температура днем в 12 часов.
-        /// </summary>
-        [ObservableProperty]
-        private string _dayTemp;
-
-        /// <summary>
-        /// Температура вечером в 18 часов.
-        /// </summary>
-        [ObservableProperty]
-        private string _eveningTemp;
-
-        /// <summary>
-        /// Температура ночью в 0 часов.
-        /// </summary>
-        [ObservableProperty]
-        private string _nightTemp;
-
-        /// <summary>
         /// Диапазон значений температуры за утро.
         /// </summary>
         [ObservableProperty]
@@ -482,36 +458,30 @@ namespace WeatherWPF.ViewModel
                 request.Method = "GET";
 
                 using (WebResponse response = await request.GetResponseAsync())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
                 {
-                    using (Stream stream = response.GetResponseStream())
-                    {
-                        using (StreamReader reader = new StreamReader(stream))
-                        {
-                            string jsonResponse = reader.ReadToEnd();
-                            WeatherData weatherData = JsonConvert.DeserializeObject<WeatherData>(jsonResponse);
+                    string jsonResponse = reader.ReadToEnd();
+                    WeatherData weatherData = JsonConvert.DeserializeObject<WeatherData>(jsonResponse);
 
-                            if (weatherData != null
-                                && weatherData.CurrentWeather != null 
-                                && weatherData.CurrentWeather.Condition != null)
-                            {
-                                if (weatherData.Forecast != null 
-                                    && weatherData.Forecast.Forecastday.Count > 0)
-                                {
-                                    WeekForecast = weatherData.Forecast.Forecastday.Select(day => new DailyForecast
-                                    {
-                                        Date = day.Date,
-                                        MaxTempC = day.Day.MaxTempC,
-                                        MinTempC = day.Day.MinTempC,
-                                        MaxTempF = day.Day.MaxTempF,
-                                        MinTempF = day.Day.MinTempF,
-                                        Condition = day.Day.Condition
-                                    }).ToList();
-                                }
-                                IsWeatherDataAvailable = true;
-                                DisplayWeatherData(weatherData);
-                                DisplayTimeData(weatherData);
-                            }
-                        }
+                    if (weatherData != null
+                        && weatherData.CurrentWeather.Condition != null
+                        && weatherData.Forecast != null
+                        && weatherData.Forecast.Forecastday.Count > 0)
+                    {
+                        WeekForecast = weatherData.Forecast.Forecastday.Select(day => new DailyForecast
+                        {
+                            Date = day.Date,
+                            MaxTempC = day.Day.MaxTempC,
+                            MinTempC = day.Day.MinTempC,
+                            MaxTempF = day.Day.MaxTempF,
+                            MinTempF = day.Day.MinTempF,
+                            Condition = day.Day.Condition
+                        }).ToList();
+
+                        IsWeatherDataAvailable = true;
+                        DisplayWeatherData(weatherData);
+                        DisplayTimeData(weatherData);
                     }
                 }
             }
@@ -530,21 +500,8 @@ namespace WeatherWPF.ViewModel
             if (!_isTempInCelsius)
             {
                 _isTempInCelsius = true;
-                Temp = Math.Round(_tempC) + "°c";
-                MorningTempRange = FormatTemperatureRange(_minMorningTempC, _maxMorningTempC);
-                DayTempRange = FormatTemperatureRange(_minDayTempC, _maxDayTempC);
-                EveningTempRange = FormatTemperatureRange(_minEveningTempC, _maxEveningTempC);
-                NightTempRange = FormatTemperatureRange(_minNightTempC, _maxNightTempC);
-
-                foreach (var forecast in WeekForecast)
-                {
-                    forecast.UpdateTemperatureDisplay(_isTempInCelsius);
-                }
-
-                TempCelsiusButtonBackground = _blackColor;
-                TempCelsiusButtonForeground = _whiteColor;
-                TempFahrenheitButtonBackground = _whiteColor;
-                TempFahrenheitButtonForeground = _blackColor;
+                UpdateTemperatureDisplay();
+                InvertColorTempButton();
             }
         }
 
@@ -557,21 +514,8 @@ namespace WeatherWPF.ViewModel
             if (_isTempInCelsius)
             {
                 _isTempInCelsius = false;
-                Temp = Math.Round(_tempF) + "°F";
-                MorningTempRange = FormatTemperatureRange(_minMorningTempF, _maxMorningTempF);
-                DayTempRange = FormatTemperatureRange(_minDayTempF, _maxDayTempF);
-                EveningTempRange = FormatTemperatureRange(_minEveningTempF, _maxEveningTempF);
-                NightTempRange = FormatTemperatureRange(_minNightTempF, _maxNightTempF);
-
-                foreach (var forecast in WeekForecast)
-                {
-                    forecast.UpdateTemperatureDisplay(_isTempInCelsius);
-                }
-
-                TempFahrenheitButtonBackground = _blackColor;
-                TempFahrenheitButtonForeground = _whiteColor;
-                TempCelsiusButtonBackground = _whiteColor;
-                TempCelsiusButtonForeground = _blackColor;
+                UpdateTemperatureDisplay();
+                InvertColorTempButton();
             }
         }
 
@@ -614,11 +558,12 @@ namespace WeatherWPF.ViewModel
         private void DisplayWeatherData(WeatherData weatherData)
         {
             DisplayTodayForecast(weatherData);
+            Location = weatherData.Location.Name + ", " + weatherData.Location.Country;
 
             _tempC = weatherData.CurrentWeather.TempC;
             _tempF = weatherData.CurrentWeather.TempF;
             Temp = FormatTemperature(_tempC);
-            ChanceOfRainToday = $"Rain - {weatherData.Forecast.Forecastday[0].Day.DailyChanceOfRain}%";
+            ChanceOfRainToday = weatherData.Forecast.Forecastday[0].Day.DailyChanceOfRain;
             ConditionText = weatherData.CurrentWeather.Condition.Text;
             ConditionIcon = "https:" + weatherData.CurrentWeather.Condition.Icon;
 
@@ -627,7 +572,7 @@ namespace WeatherWPF.ViewModel
                 forecast.UpdateTemperatureDisplay(_isTempInCelsius);
             }
 
-            UvIndex = $"Average is {weatherData.CurrentWeather.UvIndex}";
+            UvIndex = weatherData.CurrentWeather.UvIndex;
 
             WindSpeed = weatherData.CurrentWeather.WindKph;
             WindDir = weatherData.CurrentWeather.WindDirection;
@@ -696,7 +641,6 @@ namespace WeatherWPF.ViewModel
         /// <param name="weatherData"></param>
         private void DisplayTimeData(WeatherData weatherData)
         {
-            Location = weatherData.Location.Name + ", " + weatherData.Location.Country;
             longitude = weatherData.Location.Lon.ToString("0.00", CultureInfo.InvariantCulture);
             latitude = weatherData.Location.Lat.ToString("0.00", CultureInfo.InvariantCulture);
             GetTimeFromCoordinates(longitude, latitude);
@@ -771,7 +715,6 @@ namespace WeatherWPF.ViewModel
         /// </summary>
         /// <param name="windDegree">Направление ветра в градусах.</param>
         /// <returns>Угол поворота иконки.</returns>
-        // TODO: доделать
         private int GetWindDirectionAngle(double windDegree)
         {
             return windDegree switch
@@ -909,7 +852,7 @@ namespace WeatherWPF.ViewModel
         private string FormatTemperature(double temperature)
         {
             var sign = temperature > 0 ? "+" : "-";
-            if (temperature == 0) sign = "";
+            if (Math.Round(temperature) == 0) sign = "";
             return $"{sign}{Math.Round(temperature)}°";
         }
 
@@ -922,6 +865,46 @@ namespace WeatherWPF.ViewModel
         private string FormatTemperatureRange(double minTemp, double maxTemp)
         {
             return $"+{Math.Round(minTemp)}°...+{Math.Round(maxTemp)}°";
+        }
+
+        /// <summary>
+        /// Метод, который меняет отображаемую температуру 
+        /// в зависимости от выбранной температурной шкалы.
+        /// </summary>
+        private void UpdateTemperatureDisplay()
+        {
+            if (_isTempInCelsius)
+            {
+                Temp = FormatTemperature(_tempC);
+                MorningTempRange = FormatTemperatureRange(_minMorningTempC, _maxMorningTempC);
+                DayTempRange = FormatTemperatureRange(_minDayTempC, _maxDayTempC);
+                EveningTempRange = FormatTemperatureRange(_minEveningTempC, _maxEveningTempC);
+                NightTempRange = FormatTemperatureRange(_minNightTempC, _maxNightTempC);
+            }
+            else
+            {
+                Temp = FormatTemperature(_tempF);
+                MorningTempRange = FormatTemperatureRange(_minMorningTempF, _maxMorningTempF);
+                DayTempRange = FormatTemperatureRange(_minDayTempF, _maxDayTempF);
+                EveningTempRange = FormatTemperatureRange(_minEveningTempF, _maxEveningTempF);
+                NightTempRange = FormatTemperatureRange(_minNightTempF, _maxNightTempF);
+            }
+
+            foreach (var forecast in WeekForecast)
+            {
+                forecast.UpdateTemperatureDisplay(_isTempInCelsius);
+            }
+        }
+
+        /// <summary>
+        /// Метод, который инвертирует цвета кнопок, отвечающих за тип температурной шкалы.
+        /// </summary>
+        private void InvertColorTempButton()
+        {
+            TempCelsiusButtonBackground = _isTempInCelsius ? _blackColor : _whiteColor;
+            TempCelsiusButtonForeground = _isTempInCelsius ? _whiteColor : _blackColor;
+            TempFahrenheitButtonBackground = _isTempInCelsius ? _whiteColor : _blackColor;
+            TempFahrenheitButtonForeground = _isTempInCelsius ? _blackColor : _whiteColor;
         }
         #endregion
     }
